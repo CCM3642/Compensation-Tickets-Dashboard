@@ -3,12 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Crispy Chicken - Complaints Dashboard (Improved)</title>
+  <title>Crispy Chicken - Complaints Dashboard</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
-  <!-- Chart.js for analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <!-- heatmap.js for simple client-side heatmaps -->
   <script src="https://cdn.jsdelivr.net/npm/heatmapjs@2.0.5/heatmap.min.js"></script>
   <style>
     :root {
@@ -23,108 +21,66 @@
     }
 
     html, body { height: 100%; }
-    body {
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
-      background-color: var(--bg-light);
-      color: var(--text-primary);
-      margin: 0;
-      line-height: 1.55;
-    }
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial; background-color: var(--bg-light); margin:0; color: var(--text-primary); }
+    .navbar { background: linear-gradient(135deg, var(--crispy-red), var(--crispy-dark)); box-shadow:0 2px 10px rgba(0,0,0,0.2); }
+    .navbar-brand { color:#fff; font-weight:800; display:flex; align-items:center; gap:.5rem; }
 
-    .navbar {
-      background: linear-gradient(135deg, var(--crispy-red) 0%, var(--crispy-dark) 100%);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      padding: 12px 0;
-      position: sticky;
-      top: 0;
-      z-index: 1030;
-    }
-    .navbar-brand { font-weight: 800; color: #fff !important; display: flex; align-items: center; gap: .5rem; }
+    .container-page { max-width: 1280px; margin: 0 auto; padding: 20px; }
 
-    .container-page { padding: 20px; max-width: 1280px; margin: 0 auto; }
-
-    /* Stats */
-    .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
-    .stat-card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 4px 14px rgba(0,0,0,.06); border-inline-start: 6px solid transparent; }
+    .dashboard-stats { display:grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin-bottom:24px; }
+    .stat-card { background:#fff; border-radius:14px; padding:20px; box-shadow:0 4px 14px rgba(0,0,0,.06); border-left:6px solid transparent; }
     .stat-card.total { border-color: var(--crispy-red); }
-    .stat-card.open { border-color: #0d6efd; }
-    .stat-card.sent { border-color: #f59f00; }
-    .stat-card.closed { border-color: #2fb344; }
-    .stat-card h3 { margin: 4px 0 2px; font-weight: 800; }
-    .stat-card p { margin: 0; color: var(--text-secondary); font-weight: 600; }
+    .stat-card.open { border-color:#0d6efd; }
+    .stat-card.sent { border-color:#f59f00; }
+    .stat-card.closed { border-color:#2fb344; }
+    .stat-card h3 { margin:4px 0 2px; font-weight:800; }
+    .stat-card p { margin:0; color: var(--text-secondary); font-weight:600; }
 
-    /* Platform */
-    .platform-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
-    .platform-card { background:#fff; border-radius: 16px; padding: 22px; box-shadow: 0 6px 16px rgba(0,0,0,.08); border: 3px solid transparent; text-align: center; }
+    .platform-cards { display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin-bottom:24px; }
+    .platform-card { background:#fff; border-radius:16px; padding:22px; box-shadow:0 6px 16px rgba(0,0,0,.08); border:3px solid transparent; text-align:center; }
     .platform-card.noon { border-color: var(--noon-color); }
     .platform-card.careem { border-color: var(--careem-color); }
 
-    /* Tickets */
-    .tickets-section { background:#fff; border-radius: 18px; padding: 22px; box-shadow: 0 8px 20px rgba(0,0,0,.08); margin-bottom: 28px; }
-    .tickets-header { display:flex; gap:12px; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+    .tickets-section { background:#fff; border-radius:18px; padding:22px; box-shadow:0 8px 20px rgba(0,0,0,.08); margin-bottom:28px; }
+    .tickets-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
 
-    .table-responsive { border-radius: 14px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,.06); }
-    thead th { background: var(--crispy-light); color: var(--crispy-dark); font-weight: 800; border: none !important; }
+    .table-responsive { border-radius:14px; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,.06); }
+    thead th { background: var(--crispy-light); color: var(--crispy-dark); font-weight:800; border:none !important; }
     tbody tr:hover { background: rgba(211,47,47,.05); }
 
     .badge-open { background:#e7f1ff; color:#0d47a1; }
     .badge-sent { background:#fff5db; color:#a15c00; }
     .badge-closed { background:#e6f8ea; color:#1b6b2e; }
 
-    .action-btn { padding: 6px 10px; border-radius: 8px; border: none; font-weight: 700; }
-    .btn-edit { background:#ffc107; }
-    .btn-email { background:#17a2b8; color:#fff; }
+    .action-btn { padding:6px 10px; border-radius:8px; border:none; font-weight:700; cursor:pointer; transition:.2s; }
+    .btn-edit { background:#ffc107; color:#000; }
+    .btn-email { background:#0d6efd; color:#fff; }
     .btn-whatsapp { background:#25D366; color:#fff; }
     .btn-close { background:#28a745; color:#fff; }
 
-    /* 1) Long-text UX: truncation + expand */
-    .truncate { max-width: 360px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .truncate { max-width: 300px; white-space: nowrap; overflow:hidden; text-overflow:ellipsis; }
     .issue-cell { position: relative; }
-    .issue-expand { appearance: none; border: none; background: transparent; text-decoration: underline; padding: 0; margin-left: 6px; cursor: pointer; font-size: .85rem; }
+    .issue-expand { appearance:none; border:none; background:transparent; text-decoration:underline; cursor:pointer; font-size:.85rem; }
 
-    /* 2) Fixed action dock */
-    .action-dock { position: fixed; right: 16px; bottom: 16px; z-index: 1040; display: flex; flex-direction: column; gap: 10px; }
-    .action-dock .btn { box-shadow: 0 8px 24px rgba(0,0,0,.18); font-weight: 700; border-radius: 999px; padding: 12px 16px; }
+    .action-dock { position:fixed; right:16px; bottom:16px; z-index:1040; display:flex; flex-direction:column; gap:10px; }
+    .action-dock .btn { box-shadow:0 8px 24px rgba(0,0,0,.18); font-weight:700; border-radius:999px; padding:12px 16px; }
 
-    /* 3) Print styles */
-    @media print {
-      @page { margin: 14mm; }
-      .navbar, .action-dock, .tickets-header .btn, .modal, .notification { display: none !important; }
-      body { background:#fff; }
-      .container-page { padding: 0; max-width: 100%; }
-      .tickets-section, .platform-card, .stat-card { box-shadow: none !important; border: 1px solid #ddd; }
-      thead th { background: #f3f3f3 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    }
+    textarea.autogrow { overflow:hidden; resize:none; min-height:90px; }
 
-    /* Notification */
-    .notification { position: fixed; top: 20px; right: 20px; padding: 14px 18px; background:#fff; border-left: 5px solid var(--crispy-red); border-radius: 12px; box-shadow: 0 10px 26px rgba(0,0,0,.15); z-index: 2000; transform: translateX(130%); transition: transform .45s cubic-bezier(.68,-.55,.27,1.55); }
-    .notification.show { transform: translateX(0); }
-    .notification.success { border-left-color:#28a745; }
-    .notification.error { border-left-color:#dc3545; }
+    #heatmapContainer { position:fixed; inset:0; pointer-events:none; z-index:5; display:none; }
 
-    /* Modal textarea autosize */
-    textarea.autogrow { overflow: hidden; resize: none; min-height: 90px; }
+    footer { text-align:center; padding:20px; background:var(--crispy-dark); color:#fff; border-radius:18px 18px 0 0; }
 
-    /* Heatmap canvas holder */
-    #heatmapContainer { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
-
-    /* Responsive tweaks */
-    @media (max-width: 768px) {
-      .truncate { max-width: 160px; }
-    }
+    @media(max-width:768px){ .truncate{ max-width:160px; } }
   </style>
 </head>
 <body>
-  <!-- Heatmap layer (5) -->
-  <div id="heatmapContainer" aria-hidden="true"></div>
+  <div id="heatmapContainer"></div>
 
-  <!-- Navigation -->
   <nav class="navbar navbar-expand-lg navbar-dark">
     <div class="container-page">
       <a class="navbar-brand" href="#"><i class="bi bi-fire"></i> Crispy Chicken • Complaints</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
       <div class="collapse navbar-collapse" id="nav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item"><a class="nav-link active" href="#">Dashboard</a></li>
@@ -136,95 +92,77 @@
   </nav>
 
   <main class="container-page">
-    <!-- Stats -->
-    <section class="dashboard-stats" aria-label="Key stats">
+    <section class="dashboard-stats">
       <div class="stat-card total"><h3 id="totalTickets">0</h3><p>Total Tickets</p></div>
       <div class="stat-card open"><h3 id="openTickets">0</h3><p>Open Tickets</p></div>
       <div class="stat-card sent"><h3 id="sentTickets">0</h3><p>Sent Tickets</p></div>
       <div class="stat-card closed"><h3 id="closedTickets">0</h3><p>Closed Tickets</p></div>
     </section>
 
-    <!-- Platform distribution -->
-    <section class="mb-4">
-      <h2 class="h5 fw-bold text-danger" style="color: var(--crispy-dark) !important;">Platform Distribution</h2>
-      <div class="platform-cards">
-        <div class="platform-card noon text-center">
-          <i class="bi bi-cart-check fs-1 d-block mb-2" style="color: var(--noon-color)"></i>
-          <h3 id="noonCount">0</h3>
-          <p class="mb-1">Noon Orders</p>
-          <div class="fw-bold" id="noonPercentage">0%</div>
-        </div>
-        <div class="platform-card careem text-center">
-          <i class="bi bi-car-front fs-1 d-block mb-2" style="color: var(--careem-color)"></i>
-          <h3 id="careemCount">0</h3>
-          <p class="mb-1">Careem Orders</p>
-          <div class="fw-bold" id="careemPercentage">0%</div>
-        </div>
+    <section class="platform-cards">
+      <div class="platform-card noon">
+        <i class="bi bi-cart-check fs-1 d-block mb-2" style="color: var(--noon-color)"></i>
+        <h3 id="noonCount">0</h3>
+        <p>Noon Orders</p>
+        <div id="noonPercentage">0%</div>
+      </div>
+      <div class="platform-card careem">
+        <i class="bi bi-car-front fs-1 d-block mb-2" style="color: var(--careem-color)"></i>
+        <h3 id="careemCount">0</h3>
+        <p>Careem Orders</p>
+        <div id="careemPercentage">0%</div>
       </div>
     </section>
 
-    <!-- Analytics (4) -->
     <section id="reports" class="mb-4">
       <div class="row g-3">
         <div class="col-lg-6">
           <div class="tickets-section">
-            <h3 class="h6 fw-bold mb-3"><i class="bi bi-geo-alt"></i> Top Branches by Complaints</h3>
+            <h3 class="h6 fw-bold mb-3"><i class="bi bi-geo-alt"></i> Top Branches</h3>
             <canvas id="branchBar"></canvas>
           </div>
         </div>
         <div class="col-lg-6">
           <div class="tickets-section">
-            <h3 class="h6 fw-bold mb-3"><i class="bi bi-exclamation-triangle"></i> Most Common Issue Types</h3>
+            <h3 class="h6 fw-bold mb-3"><i class="bi bi-exclamation-triangle"></i> Common Issue Types</h3>
             <canvas id="issuePie"></canvas>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Tickets -->
     <section id="tickets" class="tickets-section">
       <div class="tickets-header">
         <h2 class="h5 m-0"><i class="bi bi-list-task me-1"></i> Complaint Tickets</h2>
         <div class="d-flex flex-wrap gap-2">
-          <button class="btn btn-danger" id="btnAdd" onclick="openAddTicketModal()"><i class="bi bi-plus-circle"></i> Add Ticket</button>
-          <button class="btn btn-outline-danger" onclick="addSampleTicket()"><i class="bi bi-plus-circle"></i> Add Sample</button>
+          <button class="btn btn-danger" onclick="openAddTicketModal()"><i class="bi bi-plus-circle"></i> Add Ticket</button>
           <button class="btn btn-outline-secondary" onclick="resetData()"><i class="bi bi-arrow-clockwise"></i> Reset</button>
-          <button class="btn btn-outline-dark" onclick="window.print()"><i class="bi bi-printer"></i> Print Report</button>
         </div>
       </div>
       <div id="ticketsContainer" class="mt-3"></div>
     </section>
   </main>
 
-  <!-- Fixed Action Dock (2 + 3) -->
-  <div class="action-dock" aria-label="Quick actions">
-    <button class="btn btn-danger" onclick="openAddTicketModal()"><i class="bi bi-plus-lg"></i> New Ticket</button>
-    <button class="btn btn-outline-dark" onclick="window.print()"><i class="bi bi-printer"></i> Print Report</button>
-    <button class="btn btn-outline-secondary" onclick="toggleHeatmap()"><i class="bi bi-activity"></i> Heatmap</button>
+  <div class="action-dock">
+    <button class="btn btn-danger" onclick="openAddTicketModal()"><i class="bi bi-plus-lg"></i></button>
+    <button class="btn btn-outline-dark" onclick="window.print()"><i class="bi bi-printer"></i></button>
+    <button class="btn btn-outline-secondary" onclick="toggleHeatmap()"><i class="bi bi-activity"></i></button>
   </div>
 
-  <!-- Add/Edit Ticket Modal (1: textarea autogrow) -->
-  <div class="modal fade" id="addTicketModal" tabindex="-1" aria-hidden="true">
+  <div class="modal fade" id="addTicketModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header text-white" style="background: linear-gradient(135deg, var(--crispy-red), var(--crispy-dark));">
-          <h5 class="modal-title"><i class="bi bi-plus-circle"></i> <span id="modalTitle">Add New Ticket</span></h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title" id="modalTitle">Add Ticket</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <form id="addTicketForm">
-            <input type="hidden" id="editingId" value="" />
+            <input type="hidden" id="editingId" />
             <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label" for="orderId">Order ID</label>
-                <input class="form-control" id="orderId" required />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label" for="orderDate">Order Date</label>
-                <input type="date" class="form-control" id="orderDate" required />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label" for="branch">Branch</label>
+              <div class="col-md-6"><label>Order ID</label><input class="form-control" id="orderId" required /></div>
+              <div class="col-md-6"><label>Order Date</label><input type="date" class="form-control" id="orderDate" required /></div>
+              <div class="col-md-6"><label>Branch</label>
                 <select class="form-select" id="branch" required>
                   <option value="">Select Branch</option>
                   <option>Crispy Chicken Khalidiya</option>
@@ -236,406 +174,132 @@
                   <option>Crispy Chicken Hamdan</option>
                 </select>
               </div>
-              <div class="col-md-6">
-                <label class="form-label" for="platform">Platform</label>
+              <div class="col-md-6"><label>Platform</label>
                 <select class="form-select" id="platform" required>
                   <option value="">Select Platform</option>
                   <option>Noon</option>
                   <option>Careem</option>
                 </select>
               </div>
-              <div class="col-12">
-                <label class="form-label" for="issue">Issue Description</label>
-                <textarea id="issue" class="form-control autogrow" placeholder="Write clearly…" required></textarea>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label" for="compensation">Compensation Value (AED)</label>
-                <input type="number" min="0" step="0.01" class="form-control" id="compensation" required />
-              </div>
-              <div class="col-12">
-                <div class="evidence-section border rounded p-3 bg-light-subtle">
-                  <h5 class="mb-3 text-danger"><i class="bi bi-paperclip"></i> Evidence</h5>
-                  <div class="row g-3">
-                    <div class="col-md-9">
-                      <label class="form-label" for="evidenceLink">Evidence Link (optional)</label>
-                      <input type="url" class="form-control" id="evidenceLink" placeholder="https://…" />
-                    </div>
-                    <div class="col-md-3 d-flex align-items-end">
-                      <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="noEvidence" />
-                        <label class="form-check-label" for="noEvidence">No evidence</label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <div class="col-12"><label>Issue</label><textarea class="form-control autogrow" id="issue" required></textarea></div>
+              <div class="col-md-6"><label>Compensation (AED)</label><input type="number" min="0" step="0.01" class="form-control" id="compensation" required /></div>
+              <div class="col-12"><label>Evidence Link</label><input type="url" class="form-control" id="evidenceLink" placeholder="https://…"/></div>
             </div>
-            <div class="mt-3">
-              <button class="btn btn-danger w-100 fw-bold" type="submit"><i class="bi bi-check-circle"></i> Save</button>
-            </div>
+            <button class="btn btn-danger w-100 mt-3">Save Ticket</button>
           </form>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- View/Expand Issue Modal -->
-  <div class="modal fade" id="issueModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header" style="background: linear-gradient(135deg, var(--crispy-red), var(--crispy-dark));">
-          <h5 class="modal-title text-white"><i class="bi bi-chat-square-text"></i> Issue Details</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p id="issueFullText" class="mb-0"></p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Notification -->
-  <div id="notification" class="notification"><i class="bi bi-check-circle-fill me-2"></i><span id="notificationText">Action completed successfully!</span></div>
-
-  <footer class="text-center py-4 mt-4 text-white" style="background: var(--crispy-dark); border-radius: 18px 18px 0 0;">
-    <small>&copy; 2025 Crispy Chicken Delivery Management System</small>
-  </footer>
+  <footer>&copy; 2025 Crispy Chicken</footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // ====== State ======
     let tickets = JSON.parse(localStorage.getItem('crispyTickets')) || [];
     let filteredTickets = [...tickets];
+    let heatmapVisible=false, heatmapInstance=null, branchChart, issueChart;
 
-    // Heatmap
-    let heatmapVisible = false;
-    let heatmapInstance = null;
-
-    // Charts
-    let branchChart, issueChart;
-
-    // ====== Utils ======
-    const $ = (sel) => document.querySelector(sel);
-    const $$ = (sel) => document.querySelectorAll(sel);
-
-    function showNotification(msg, type = 'success') {
-      const box = $('#notification');
-      $('#notificationText').textContent = msg;
-      box.className = 'notification ' + (type === 'error' ? 'error' : 'success') + ' show';
-      setTimeout(() => box.classList.remove('show'), 2600);
-    }
-
-    function saveToStorage() { localStorage.setItem('crispyTickets', JSON.stringify(tickets)); }
-
-    function classifyIssue(text = '') {
-      const t = text.toLowerCase();
-      if (/(cold|temperature|ice)/.test(t)) return 'Cold Food';
-      if (/(late|delay|time)/.test(t)) return 'Late Delivery';
-      if (/(wrong|incorrect|different)/.test(t)) return 'Wrong Items';
-      if (/(missing|not included|didn\'t receive)/.test(t)) return 'Missing Items';
-      if (/(quality|taste|bad|spoiled)/.test(t)) return 'Food Quality';
-      return 'Other';
-    }
-
-    function autogrow(el) {
-      el.style.height = 'auto';
-      el.style.height = el.scrollHeight + 'px';
-    }
-
-    function currency(aed) { return 'AED ' + Number(aed || 0).toFixed(2); }
-
-    // ====== Sample data ======
-    function addSampleData() {
-      const sample = [
-        { id: Date.now(), orderId: 'NC123456', orderDate: '2025-08-26', branch: 'Crispy Chicken Khalidiya', platform: 'Noon', issue: 'Food was cold and delivery was late', compensation: 50, evidence: 'https://example.com/evidence.jpg', status: 'Open', dateCreated: '2025-08-26' },
-        { id: Date.now()+1, orderId: 'CR789012', orderDate: '2025-08-24', branch: 'Crispy Chicken Muroor', platform: 'Careem', issue: 'Wrong order items received', compensation: 75, evidence: 'None', status: 'Sent', dateCreated: '2025-08-24' },
-        { id: Date.now()+2, orderId: 'NC345678', orderDate: '2025-08-22', branch: 'Crispy Chicken Al Barsha', platform: 'Noon', issue: 'Missing items in the order', compensation: 30, evidence: 'None', status: 'Closed', dateCreated: '2025-08-22' }
-      ];
-      tickets = sample; filteredTickets = [...tickets]; saveToStorage();
-    }
-
-    // ====== Init ======
-    document.addEventListener('DOMContentLoaded', () => {
-      if (tickets.length === 0) addSampleData();
-      // today date
-      const today = new Date().toISOString().split('T')[0];
-      $('#orderDate').value = today;
-
-      // textarea autogrow
-      $$('#issue.autogrow').forEach(el => { autogrow(el); el.addEventListener('input', () => autogrow(el)); });
-
-      renderTickets();
-      updateStats();
-      updatePlatformStats();
-      renderCharts();
-
-      // form submit
-      $('#addTicketForm').addEventListener('submit', saveTicket);
-
-      // Lightweight usability tracking (5)
+    document.addEventListener('DOMContentLoaded',()=>{
+      if(tickets.length===0)addSampleData();
+      renderTickets(); updateStats(); updatePlatformStats(); renderCharts();
+      document.getElementById('addTicketForm').addEventListener('submit', saveTicket);
       initHeatmapLayer();
-      document.addEventListener('click', recordInteraction, true);
-      document.addEventListener('mousemove', throttle(recordMouseMove, 120));
+      document.addEventListener('click',recordInteraction,true);
+      document.addEventListener('mousemove', throttle(recordMouseMove,120));
     });
 
-    // ====== Tickets UI ======
-    function renderTickets() {
-      const container = $('#ticketsContainer');
-      if (filteredTickets.length === 0) {
-        container.innerHTML = `<div class="text-center p-5 border rounded-3 bg-light"><i class="bi bi-inbox fs-1 d-block mb-3 text-secondary"></i><h3 class="h6 fw-bold">No tickets found</h3><p class="text-secondary">Add your first ticket using the buttons above</p></div>`;
-        return;
-      }
+    function addSampleData(){
+      tickets=[{id:Date.now(),orderId:'NC123',orderDate:'2025-08-26',branch:'Crispy Chicken Khalidiya',platform:'Noon',issue:'Food was cold',compensation:50,evidence:'None',status:'Open',dateCreated:'2025-08-26'}];
+      filteredTickets=[...tickets]; saveToStorage();
+    }
 
-      let html = `<div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr>
-        <th>Order ID</th><th>Order Date</th><th>Branch</th><th>Platform</th><th>Issue</th><th>Evidence</th><th>Status</th><th>Compensation</th><th>Actions</th>
-      </tr></thead><tbody>`;
+    function saveToStorage(){ localStorage.setItem('crispyTickets', JSON.stringify(tickets)); }
 
-      filteredTickets.forEach(t => {
-        const statusClass = 'badge-' + t.status.toLowerCase();
-        const evidence = t.evidence === 'None' ? '<span class="text-muted">No evidence</span>' : `<a href="${t.evidence}" target="_blank">link</a>`;
-        const issueShort = `<span class="truncate">${escapeHtml(t.issue)}</span> <button class="issue-expand" onclick="openIssueModal(${t.id})">View</button>`;
-        html += `<tr>
-          <td><strong>${t.orderId}</strong></td>
-          <td>${t.orderDate}</td>
-          <td>${t.branch}</td>
-          <td>${t.platform}</td>
-          <td class="issue-cell">${issueShort}</td>
-          <td>${evidence}</td>
-          <td><span class="badge ${statusClass}">${t.status}</span></td>
-          <td>${currency(t.compensation)}</td>
-          <td>
-            <div class="d-flex flex-wrap gap-1">
-              <button class="action-btn btn-edit" onclick="editTicket(${t.id})"><i class="bi bi-pencil"></i></button>
-              <button class="action-btn btn-email text-white" onclick="sendEmail(${t.id})"><i class="bi bi-envelope"></i></button>
-              <button class="action-btn btn-whatsapp text-white" onclick="sendWhatsApp(${t.id})"><i class="bi bi-whatsapp"></i></button>
-              <button class="action-btn btn-close" onclick="closeTicket(${t.id})"><i class="bi bi-check2-circle"></i></button>
-            </div>
-          </td>
-        </tr>`;
+    function renderTickets(){
+      const container=document.getElementById('ticketsContainer');
+      if(filteredTickets.length===0){ container.innerHTML='<div class="text-center p-5 border rounded-3 bg-light">No tickets found</div>'; return; }
+      let html='<div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Order ID</th><th>Branch</th><th>Platform</th><th>Issue</th><th>Evidence</th><th>Status</th><th>Compensation</th><th>Actions</th></tr></thead><tbody>';
+      filteredTickets.forEach(t=>{
+        const statusClass='badge-'+t.status.toLowerCase();
+        const evidence=t.evidence==='None'?'<span class="text-muted">No evidence</span>':'<a href="'+t.evidence+'" target="_blank">link</a>';
+        const issueShort=`<span class="truncate">${t.issue}</span> <button class="issue-expand" onclick="openIssueModal(${t.id})">View</button>`;
+        html+=`<tr><td>${t.orderId}</td><td>${t.branch}</td><td>${t.platform}</td><td>${issueShort}</td><td>${evidence}</td><td><span class="badge ${statusClass}">${t.status}</span></td><td>${t.compensation}</td><td>
+        <button class="action-btn btn-edit" onclick="editTicket(${t.id})"><i class="bi bi-pencil"></i></button>
+        <button class="action-btn btn-email" onclick="sendEmail(${t.id})"><i class="bi bi-envelope"></i></button>
+        <button class="action-btn btn-whatsapp" onclick="sendWhatsApp(${t.id})"><i class="bi bi-whatsapp"></i></button>
+        <button class="action-btn btn-close" onclick="closeTicket(${t.id})"><i class="bi bi-check2-circle"></i></button>
+        </td></tr>`;
       });
-
-      html += `</tbody></table></div>`;
-      container.innerHTML = html;
+      html+='</tbody></table></div>'; container.innerHTML=html;
     }
 
-    function updateStats() {
-      const total = tickets.length;
-      const open = tickets.filter(t => t.status === 'Open').length;
-      const sent = tickets.filter(t => t.status === 'Sent').length;
-      const closed = tickets.filter(t => t.status === 'Closed').length;
-      $('#totalTickets').textContent = total;
-      $('#openTickets').textContent = open;
-      $('#sentTickets').textContent = sent;
-      $('#closedTickets').textContent = closed;
+    function updateStats(){ 
+      const total=tickets.length; const open=tickets.filter(t=>t.status==='Open').length;
+      const sent=tickets.filter(t=>t.status==='Sent').length; const closed=tickets.filter(t=>t.status==='Closed').length;
+      document.getElementById('totalTickets').textContent=total;
+      document.getElementById('openTickets').textContent=open;
+      document.getElementById('sentTickets').textContent=sent;
+      document.getElementById('closedTickets').textContent=closed;
     }
 
-    function updatePlatformStats() {
-      const total = tickets.length || 1;
-      const noon = tickets.filter(t => t.platform === 'Noon').length;
-      const careem = tickets.filter(t => t.platform === 'Careem').length;
-      $('#noonCount').textContent = noon;
-      $('#careemCount').textContent = careem;
-      $('#noonPercentage').textContent = ((noon/total)*100).toFixed(1) + '%';
-      $('#careemPercentage').textContent = ((careem/total)*100).toFixed(1) + '%';
+    function updatePlatformStats(){ 
+      const total=tickets.length||1;
+      const noon=tickets.filter(t=>t.platform==='Noon').length;
+      const careem=tickets.filter(t=>t.platform==='Careem').length;
+      document.getElementById('noonCount').textContent=noon;
+      document.getElementById('careemCount').textContent=careem;
+      document.getElementById('noonPercentage').textContent=((noon/total)*100).toFixed(1)+'%';
+      document.getElementById('careemPercentage').textContent=((careem/total)*100).toFixed(1)+'%';
     }
 
-    // ====== Charts (4) ======
-    function renderCharts() {
-      const byBranch = groupCounts(tickets, t => t.branch);
-      const issueTypes = groupCounts(tickets, t => classifyIssue(t.issue));
-
-      const barCtx = document.getElementById('branchBar');
-      const pieCtx = document.getElementById('issuePie');
-
-      const barLabels = Object.keys(byBranch);
-      const barData = Object.values(byBranch);
-
-      const pieLabels = Object.keys(issueTypes);
-      const pieData = Object.values(issueTypes);
-
-      if (branchChart) branchChart.destroy();
-      if (issueChart) issueChart.destroy();
-
-      branchChart = new Chart(barCtx, {
-        type: 'bar',
-        data: { labels: barLabels, datasets: [{ label: 'Complaints', data: barData }] },
-        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
-      });
-
-      issueChart = new Chart(pieCtx, {
-        type: 'pie',
-        data: { labels: pieLabels, datasets: [{ data: pieData }] },
-        options: { responsive: true }
-      });
-    }
-
-    function groupCounts(arr, keyFn) {
-      return arr.reduce((acc, item) => { const k = keyFn(item) || 'Unknown'; acc[k] = (acc[k]||0)+1; return acc; }, {});
-    }
-
-    // ====== Modal helpers ======
-    function openAddTicketModal() {
-      $('#modalTitle').textContent = 'Add New Ticket';
-      $('#editingId').value = '';
-      $('#addTicketForm').reset();
-      $('#orderDate').value = new Date().toISOString().split('T')[0];
-      const modal = new bootstrap.Modal(document.getElementById('addTicketModal'));
-      modal.show();
-    }
-
-    function openIssueModal(id) {
-      const t = tickets.find(x => x.id === id);
-      if (!t) return;
-      $('#issueFullText').textContent = t.issue;
-      new bootstrap.Modal(document.getElementById('issueModal')).show();
-    }
-
-    function saveTicket(ev) {
+    function saveTicket(ev){
       ev.preventDefault();
-      const editingId = $('#editingId').value;
-      const data = {
-        orderId: $('#orderId').value.trim(),
-        orderDate: $('#orderDate').value,
-        branch: $('#branch').value,
-        platform: $('#platform').value,
-        issue: $('#issue').value.trim(),
-        compensation: parseFloat($('#compensation').value || '0'),
-        evidence: $('#noEvidence').checked ? 'None' : ($('#evidenceLink').value.trim() || 'None'),
-      };
-
-      if (!data.orderId || !data.orderDate || !data.branch || !data.platform || !data.issue) {
-        showNotification('Please fill all required fields', 'error');
-        return;
-      }
-
-      if (editingId) {
-        const t = tickets.find(x => String(x.id) === editingId);
-        if (!t) return;
-        Object.assign(t, data);
-        showNotification('Ticket updated');
-      } else {
-        tickets.unshift({ id: Date.now(), status: 'Open', dateCreated: new Date().toISOString().split('T')[0], ...data });
-        showNotification('Ticket added');
-      }
-
-      filteredTickets = [...tickets];
-      saveToStorage();
-      renderTickets();
-      updateStats();
-      updatePlatformStats();
-      renderCharts();
-
+      const data={orderId:document.getElementById('orderId').value, branch:document.getElementById('branch').value, platform:document.getElementById('platform').value, issue:document.getElementById('issue').value, compensation:parseFloat(document.getElementById('compensation').value), evidence:document.getElementById('evidenceLink').value||'None'};
+      tickets.unshift({id:Date.now(), status:'Open', dateCreated:new Date().toISOString().split('T')[0], ...data});
+      filteredTickets=[...tickets]; saveToStorage(); renderTickets(); updateStats(); updatePlatformStats(); renderCharts();
       bootstrap.Modal.getInstance(document.getElementById('addTicketModal')).hide();
     }
 
-    function editTicket(id) {
-      const t = tickets.find(x => x.id === id);
-      if (!t) return;
-      $('#modalTitle').textContent = 'Edit Ticket';
-      $('#editingId').value = String(t.id);
-      $('#orderId').value = t.orderId;
-      $('#orderDate').value = t.orderDate;
-      $('#branch').value = t.branch;
-      $('#platform').value = t.platform;
-      $('#issue').value = t.issue; autogrow($('#issue'));
-      $('#compensation').value = t.compensation;
-      $('#noEvidence').checked = t.evidence === 'None';
-      $('#evidenceLink').value = t.evidence === 'None' ? '' : t.evidence;
+    function editTicket(id){
+      const t=tickets.find(x=>x.id===id); if(!t)return;
+      document.getElementById('orderId').value=t.orderId;
+      document.getElementById('branch').value=t.branch;
+      document.getElementById('platform').value=t.platform;
+      document.getElementById('issue').value=t.issue;
+      document.getElementById('compensation').value=t.compensation;
+      document.getElementById('evidenceLink').value=t.evidence==='None'?'':t.evidence;
+      document.getElementById('editingId').value=id;
       new bootstrap.Modal(document.getElementById('addTicketModal')).show();
     }
 
-    function closeTicket(id) {
-      if (!confirm('Close this ticket?')) return;
-      const t = tickets.find(x => x.id === id);
-      if (!t) return;
-      t.status = 'Closed';
-      saveToStorage();
-      renderTickets();
-      updateStats();
-      renderCharts();
-      showNotification('Ticket closed');
+    function closeTicket(id){
+      const t=tickets.find(x=>x.id===id); if(!t)return;
+      t.status='Closed'; saveToStorage(); renderTickets(); updateStats();
     }
 
-    function addSampleTicket() {
-      const s = [
-        { id: Date.now(), orderId: `NC${Math.floor(Math.random()*900000)+100000}`, orderDate: new Date().toISOString().split('T')[0], branch: 'Crispy Chicken Khalidiya', platform: 'Noon', issue: 'Food was cold and delivery was late', compensation: 50, evidence: 'None', status: 'Open', dateCreated: new Date().toISOString().split('T')[0] },
-        { id: Date.now()+1, orderId: `CR${Math.floor(Math.random()*900000)+100000}`, orderDate: new Date().toISOString().split('T')[0], branch: 'Crispy Chicken Muroor', platform: 'Careem', issue: 'Wrong order items received', compensation: 75, evidence: 'None', status: 'Open', dateCreated: new Date().toISOString().split('T')[0] }
-      ];
-      s.forEach(t => tickets.unshift(t));
-      filteredTickets = [...tickets];
-      saveToStorage();
-      renderTickets();
-      updateStats();
-      updatePlatformStats();
-      renderCharts();
-      showNotification('Sample tickets added');
+    function sendEmail(id){ const t=tickets.find(x=>x.id===id); if(!t)return; window.open(`mailto:support@crispychicken.ae?subject=Complaint+${t.orderId}&body=Issue:${t.issue}%0D%0ACompensation:${t.compensation}`); }
+    function sendWhatsApp(id){ const t=tickets.find(x=>x.id===id); if(!t)return; window.open(`https://wa.me/971500000000?text=OrderID:${t.orderId}%0AIssue:${t.issue}%0ACompensation:${t.compensation}`); }
+
+    function openAddTicketModal(){ document.getElementById('addTicketForm').reset(); document.getElementById('editingId').value=''; new bootstrap.Modal(document.getElementById('addTicketModal')).show(); }
+    function resetData(){ if(confirm('Reset all tickets?')){ tickets=[]; filteredTickets=[]; saveToStorage(); renderTickets(); updateStats(); updatePlatformStats(); renderCharts(); } }
+
+    function renderCharts(){
+      const branches={}, issues={};
+      tickets.forEach(t=>{ branches[t.branch]=(branches[t.branch]||0)+1; issues[t.issue]=(issues[t.issue]||0)+1; });
+      const branchLabels=Object.keys(branches); const branchData=Object.values(branches);
+      const issueLabels=Object.keys(issues); const issueData=Object.values(issues);
+      if(branchChart) branchChart.destroy(); if(issueChart) issueChart.destroy();
+      branchChart=new Chart(document.getElementById('branchBar'),{type:'bar',data:{labels:branchLabels,datasets:[{label:'Tickets',data:branchData,backgroundColor:'rgba(211,47,47,0.6)'}]}, options:{responsive:true}});
+      issueChart=new Chart(document.getElementById('issuePie'),{type:'pie',data:{labels:issueLabels,datasets:[{data:issueData,backgroundColor:['#d32f2f','#f59f00','#25D366','#0d6efd','#ffc107']}]}, options:{responsive:true}});
     }
 
-    function resetData() {
-      if (!confirm('Reset all tickets?')) return;
-      localStorage.removeItem('crispyTickets');
-      tickets = []; filteredTickets = [];
-      renderTickets(); updateStats(); updatePlatformStats(); renderCharts();
-      showNotification('Data reset');
-    }
+    function initHeatmapLayer(){ heatmapInstance=h337.create({container:document.getElementById('heatmapContainer'),radius:40,maxOpacity:.6,minOpacity:0,blur:.9,gradient:{'.4':'blue','.6':'cyan','.8':'yellow','1':'red'}}); }
+    function toggleHeatmap(){ heatmapVisible=!heatmapVisible; document.getElementById('heatmapContainer').style.display=heatmapVisible?'block':'none'; }
 
-    function sendEmail(id) {
-      const t = tickets.find(x => x.id === id);
-      if (!t) return;
-      const subject = `Complaint Regarding Order ${t.orderId}`;
-      const body = `Dear Customer,\n\nWe are writing regarding your complaint about order ${t.orderId} from ${t.branch}.\n\nIssue: ${t.issue}\n\nWe are investigating and will update you shortly.\n\nThank you,\nCrispy Chicken Team`;
-      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      t.status = 'Sent'; saveToStorage(); renderTickets(); updateStats(); renderCharts(); showNotification('Email client opened');
-    }
-
-    function sendWhatsApp(id) {
-      const t = tickets.find(x => x.id === id); if (!t) return;
-      const branchNumbers = { 'Crispy Chicken Khalidiya': '971569494764', 'Crispy Chicken Muroor': '971505414641', 'Crispy Chicken Shabiya 11': '971562690688', 'Crispy Chicken Al Barsha': '971569659524', 'Crispy Chicken Al Satwa': '971567970685', 'Crispy Chicken Electra': '971563866859', 'Crispy Chicken Hamdan': '971556886650' };
-      const bn = branchNumbers[t.branch]; if (!bn) { showNotification('No WhatsApp for branch', 'error'); return; }
-      const msg = `Hi, I\'m writing about order ${t.orderId} from ${t.branch}. Issue: ${t.issue}. Please assist.`;
-      window.open(`https://wa.me/${bn}?text=${encodeURIComponent(msg)}`, '_blank');
-      t.status = 'Sent'; saveToStorage(); renderTickets(); updateStats(); renderCharts(); showNotification('WhatsApp opened');
-    }
-
-    // ====== Usability Tracking + Heatmap (5) ======
-    function initHeatmapLayer() {
-      const container = document.getElementById('heatmapContainer');
-      heatmapInstance = h337.create({ container, radius: 35, maxOpacity: .6, minOpacity: .05, blur: .85 });
-      container.style.display = 'none';
-    }
-
-    function toggleHeatmap() {
-      heatmapVisible = !heatmapVisible;
-      document.getElementById('heatmapContainer').style.display = heatmapVisible ? 'block' : 'none';
-    }
-
-    const interactions = [];
-    function recordInteraction(e) {
-      const t = Date.now();
-      const entry = { t, type: 'click', x: e.clientX, y: e.clientY, tag: e.target.tagName, id: e.target.id || null, cls: e.target.className || null };
-      interactions.push(entry);
-      if (heatmapInstance) heatmapInstance.addData({ x: e.clientX, y: e.clientY, value: 1 });
-      // Keep only recent 200 to avoid memory growth
-      if (interactions.length > 200) interactions.shift();
-    }
-    function recordMouseMove(e) {
-      if (!heatmapVisible || !heatmapInstance) return;
-      heatmapInstance.addData({ x: e.clientX, y: e.clientY, value: .2 });
-    }
-    function throttle(fn, ms) {
-      let last = 0; return (...args) => { const now = Date.now(); if (now - last >= ms) { last = now; fn.apply(this, args); } };
-    }
-
-    // Export interactions for quick usability review
-    window.exportUsabilityLog = function() {
-      const data = JSON.stringify({ version: 1, at: new Date().toISOString(), interactions }, null, 2);
-      const blob = new Blob([data], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'usability-log.json'; a.click(); URL.revokeObjectURL(url);
-    }
-
-    // ====== Helpers ======
-    function escapeHtml(s='') { return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c])); }
+    function recordInteraction(ev){ if(!heatmapVisible)return; const rect=document.body.getBoundingClientRect(); heatmapInstance.addData({x:ev.clientX, y:ev.clientY, value:1}); }
+    let lastMove=0; function throttle(fn,limit){ return function(e){ const now=Date.now(); if(now-lastMove>limit){ lastMove=now; fn(e); }};}
+    function recordMouseMove(ev){ recordInteraction(ev); }
   </script>
 </body>
 </html>
