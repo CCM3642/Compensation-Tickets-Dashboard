@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Compensation Tickets Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/heatmapjs@2.0.5/heatmap.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .dock {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-end;
+      z-index: 1000;
+      cursor: grab;
+    }
+    .dock-buttons { display: none; flex-direction: column; gap: 8px; }
+    .dock-buttons.show { display: flex; }
+    #heatmapContainer { position: fixed; top:0; left:0; width:100%; height:100%; z-index:999; pointer-events:none; display:none; }
+  </style>
+</head>
+<body class="bg-gray-50 p-6">
+
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">📑 Compensation Tickets</h1>
+  </div>
+
+  <!-- Tickets Table -->
+  <div class="bg-white shadow rounded-lg p-4 overflow-x-auto">
+    <table id="ticketsTable" class="min-w-full border-collapse">
+      <thead>
+        <tr class="text-left text-gray-700 border-b">
+          <th class="py-2 px-3">Order ID</th>
+          <th class="py-2 px-3">Order Date</th>
+          <th class="py-2 px-3">Branch</th>
+          <th class="py-2 px-3">Platform</th>
+          <th class="py-2 px-3">Issue</th>
+        </tr>
+      </thead>
+      <tbody id="ticketsBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Charts Section -->
+  <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+    <div class="bg-white p-4 rounded-lg shadow">
+      <h2 class="text-lg font-semibold mb-2">Complaints by Branch</h2>
+      <canvas id="barChart"></canvas>
+    </div>
+    <div class="bg-white p-4 rounded-lg shadow">
+      <h2 class="text-lg font-semibold mb-2">Issues Breakdown</h2>
+      <canvas id="pieChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Floating Dock -->
+  <div id="dock" class="dock">
+    <button id="dockToggle" class="bg-gray-800 text-white px-4 py-2 rounded-full shadow">⚙️</button>
+    <div id="dockButtons" class="dock-buttons">
+      <button id="newTicketBtn" class="bg-red-500 text-white px-4 py-2 rounded shadow">➕ New Ticket</button>
+      <button id="sampleBtn" class="bg-red-400 text-white px-4 py-2 rounded shadow">📌 Add Sample</button>
+      <button id="resetBtn" class="bg-gray-400 text-white px-4 py-2 rounded shadow">🔄 Reset</button>
+      <button id="printBtn" class="bg-blue-500 text-white px-4 py-2 rounded shadow">🖨️ Print</button>
+      <button id="dashboardBtn" class="bg-green-500 text-white px-4 py-2 rounded shadow">📊 Dashboard</button>
+      <button id="heatmapBtn" class="bg-yellow-500 text-white px-4 py-2 rounded shadow">🔥 Heatmap</button>
+      <button id="exportBtn" class="bg-indigo-500 text-white px-4 py-2 rounded shadow">📂 Export</button>
+    </div>
+  </div>
+
+  <!-- Heatmap -->
+  <div id="heatmapContainer"></div>
+
+  <script>
+    // Load data
+    let tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
+
+    const tbody = document.getElementById("ticketsBody");
+    const heatmapContainer = document.getElementById("heatmapContainer");
+    const heatmap = h337.create({ container: heatmapContainer });
+
+    // Render tickets
+    function renderTickets() {
+      tbody.innerHTML = "";
+      tickets.forEach(t => {
+        const row = document.createElement("tr");
+        row.className = "border-b";
+        row.innerHTML = `
+          <td class="font-bold px-3 py-2">${t.id}</td>
+          <td class="px-3 py-2">${t.date}</td>
+          <td class="px-3 py-2">${t.branch}</td>
+          <td class="px-3 py-2">${t.platform}</td>
+          <td class="px-3 py-2">${t.issue}</td>
+        `;
+        tbody.appendChild(row);
+      });
+      localStorage.setItem("tickets", JSON.stringify(tickets));
+      updateCharts();
+    }
+
+    // Charts
+    let barChart, pieChart;
+    function updateCharts() {
+      const branchCount = {};
+      const issueCount = {};
+
+      tickets.forEach(t => {
+        branchCount[t.branch] = (branchCount[t.branch] || 0) + 1;
+        issueCount[t.issue] = (issueCount[t.issue] || 0) + 1;
+      });
+
+      // Bar Chart
+      if (barChart) barChart.destroy();
+      barChart = new Chart(document.getElementById("barChart"), {
+        type: "bar",
+        data: {
+          labels: Object.keys(branchCount),
+          datasets: [{ label: "Complaints", data: Object.values(branchCount), backgroundColor: "rgba(239,68,68,0.7)" }]
+        }
+      });
+
+      // Pie Chart
+      if (pieChart) pieChart.destroy();
+      pieChart = new Chart(document.getElementById("pieChart"), {
+        type: "pie",
+        data: {
+          labels: Object.keys(issueCount),
+          datasets: [{ data: Object.values(issueCount), backgroundColor: ["#ef4444","#3b82f6","#10b981","#f59e0b","#8b5cf6","#6b7280"] }]
+        }
+      });
+    }
+
+    // Buttons
+    document.getElementById("dockToggle").onclick = () => {
+      document.getElementById("dockButtons").classList.toggle("show");
+    };
+
+    document.getElementById("newTicketBtn").onclick = () => {
+      const id = prompt("Order ID:");
+      const date = prompt("Order Date (YYYY-MM-DD):");
+      const branch = prompt("Branch:");
+      const platform = prompt("Platform:");
+      const issue = prompt("Issue:");
+      if (id && date && branch && platform && issue) {
+        tickets.push({ id, date, branch, platform, issue });
+        renderTickets();
+      }
+    };
+
+    document.getElementById("sampleBtn").onclick = () => {
+      tickets.push({ id: "SMP" + Math.floor(Math.random()*1000), date: "2025-09-02", branch: "Crispy Chicken Muroor", platform: "Noon", issue: "Missing Item" });
+      renderTickets();
+    };
+
+    document.getElementById("resetBtn").onclick = () => {
+      if (confirm("Clear all tickets?")) {
+        tickets = [];
+        renderTickets();
+      }
+    };
+
+    document.getElementById("printBtn").onclick = () => window.print();
+
+    document.getElementById("dashboardBtn").onclick = () => {
+      document.getElementById("dashboard").scrollIntoView({ behavior: "smooth" });
+    };
+
+    document.getElementById("heatmapBtn").onclick = () => {
+      heatmapContainer.style.display = heatmapContainer.style.display === "none" ? "block" : "none";
+      if (heatmapContainer.style.display === "block") {
+        const points = [];
+        for (let i = 0; i < 200; i++) {
+          points.push({ x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight, value: 1 });
+        }
+        heatmap.setData({ max: 5, data: points });
+      }
+    };
+
+    document.getElementById("exportBtn").onclick = () => {
+      let csv = "Order ID,Date,Branch,Platform,Issue\n";
+      tickets.forEach(t => {
+        csv += `${t.id},${t.date},${t.branch},${t.platform},${t.issue}\n`;
+      });
+      const blob = new Blob([csv], { type: "text/csv" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "tickets.csv";
+      link.click();
+    };
+
+    // Draggable Dock
+    const dock = document.getElementById("dock");
+    let isDragging = false, offsetX, offsetY;
+    dock.addEventListener("mousedown", e => {
+      if (e.target.id === "dockToggle") return;
+      isDragging = true;
+      offsetX = e.clientX - dock.getBoundingClientRect().left;
+      offsetY = e.clientY - dock.getBoundingClientRect().top;
+    });
+    document.addEventListener("mousemove", e => {
+      if (!isDragging) return;
+      dock.style.left = `${e.clientX - offsetX}px`;
+      dock.style.top = `${e.clientY - offsetY}px`;
+      dock.style.bottom = "auto";
+      dock.style.right = "auto";
+    });
+    document.addEventListener("mouseup", () => isDragging = false);
+
+    // Init
+    renderTickets();
+  </script>
+</body>
+</html>
