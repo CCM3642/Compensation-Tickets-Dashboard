@@ -12,7 +12,6 @@
             --crispy-dark: #b71c1c;
             --crispy-light: #ffcdd2;
             --bg-light: #fafafa;
-            --bg-dark: #f5f5f5;
             --text-primary: #333;
             --text-secondary: #666;
             --noon-color: #FFB800;
@@ -25,6 +24,7 @@
             color: var(--text-primary);
             margin: 0;
             padding: 0;
+            line-height: 1.6;
         }
         
         .navbar {
@@ -48,201 +48,146 @@
         
         .container {
             padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            background-color: white;
-            overflow: hidden;
-            transition: transform 0.3s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .card-header {
-            background: linear-gradient(135deg, var(--crispy-red) 0%, var(--crispy-dark) 100%);
-            color: white;
-            font-weight: 600;
-            padding: 15px 20px;
-            border: none;
-        }
-        
-        .btn-crispy {
-            background-color: var(--crispy-red);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            cursor: pointer;
-        }
-        
-        .btn-crispy:hover {
-            background-color: var(--crispy-dark);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-        }
-        
-        .btn-email {
-            background: linear-gradient(135deg, #007bff, #0056b3);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0,123,255,0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-        
-        .btn-email:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,123,255,0.4);
-        }
-        
-        .btn-whatsapp {
-            background: linear-gradient(135deg, #25D366, #128C7E);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(37,211,102,0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-        
-        .btn-whatsapp:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(37,211,102,0.4);
-        }
-        
-        .btn-close-ticket {
-            background: linear-gradient(135deg, #dc3545, #c82333);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(220,53,69,0.3);
-            cursor: pointer;
-        }
-        
-        .btn-close-ticket:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(220,53,69,0.4);
-        }
-        
-        .btn-edit {
-            background: linear-gradient(135deg, #ffc107, #e0a800);
-            color: #212529;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(255,193,7,0.3);
-            cursor: pointer;
-        }
-        
-        .btn-edit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(255,193,7,0.4);
-        }
-        
-        .stats-card {
-            border-left: 5px solid var(--crispy-red);
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-            margin-bottom: 20px;
-            border-radius: 10px;
-        }
-        
-        .stats-card:hover {
-            transform: translateX(5px);
-        }
-        
-        .stats-card h3 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin: 0;
-        }
-        
-        .stats-card p {
-            margin: 5px 0 0;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-        
-        .stats-card.total h3 { color: var(--crispy-red); }
-        .stats-card.open h3 { color: #0d47a1; }
-        .stats-card.sent h3 { color: #ff8f00; }
-        .stats-card.closed h3 { color: #2e7d32; }
-        
-        .platform-stats {
+        /* Dashboard Stats Cards */
+        .dashboard-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
         
-        .platform-card {
+        .stat-card {
             background: white;
             border-radius: 15px;
             padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .stat-card.total {
+            border-color: var(--crispy-red);
+        }
+        
+        .stat-card.open {
+            border-color: #007bff;
+        }
+        
+        .stat-card.sent {
+            border-color: #ffc107;
+        }
+        
+        .stat-card.closed {
+            border-color: #28a745;
+        }
+        
+        .stat-card h3 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .stat-card.total h3 {
+            color: var(--crispy-red);
+        }
+        
+        .stat-card.open h3 {
+            color: #007bff;
+        }
+        
+        .stat-card.sent h3 {
+            color: #ffc107;
+        }
+        
+        .stat-card.closed h3 {
+            color: #28a745;
+        }
+        
+        .stat-card p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        /* Platform Cards */
+        .platform-section {
+            margin-bottom: 40px;
+        }
+        
+        .platform-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .platform-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
             box-shadow: 0 8px 25px rgba(0,0,0,0.1);
             text-align: center;
-            transition: all 0.3s ease;
-            border: 3px solid transparent;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .platform-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
         }
         
         .platform-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .platform-card:hover::after {
+            top: -50%;
+            left: -50%;
         }
         
         .platform-card.noon {
-            border-color: var(--noon-color);
+            border: 3px solid var(--noon-color);
         }
         
         .platform-card.careem {
-            border-color: var(--careem-color);
-        }
-        
-        .platform-card h3 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin: 15px 0;
-        }
-        
-        .platform-card.noon h3 {
-            color: var(--noon-color);
-        }
-        
-        .platform-card.careem h3 {
-            color: var(--careem-color);
+            border: 3px solid var(--careem-color);
         }
         
         .platform-card .platform-icon {
             font-size: 4rem;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
         
         .platform-card.noon .platform-icon {
@@ -253,35 +198,132 @@
             color: var(--careem-color);
         }
         
-        .platform-card .percentage {
-            font-size: 1.2rem;
-            font-weight: 600;
+        .platform-card h3 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 10px 0;
+        }
+        
+        .platform-card.noon h3 {
+            color: var(--noon-color);
+        }
+        
+        .platform-card.careem h3 {
+            color: var(--careem-color);
+        }
+        
+        .platform-card p {
+            margin: 15px 0 0;
             color: var(--text-secondary);
-            margin-top: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .platform-card .percentage {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-top: 15px;
+        }
+        
+        /* Tickets Table Section */
+        .tickets-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .tickets-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .tickets-header h2 {
+            margin: 0;
+            color: var(--crispy-dark);
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-primary {
+            background-color: var(--crispy-red);
+            border-color: var(--crispy-dark);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(211, 47, 47, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--crispy-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(211, 47, 47, 0.4);
+        }
+        
+        .btn-outline-primary {
+            border-color: var(--crispy-red);
+            color: var(--crispy-red);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--crispy-light);
+            border-color: var(--crispy-dark);
+        }
+        
+        /* Tickets Table */
+        .table-responsive {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
         
         .table {
-            color: var(--text-primary);
+            margin-bottom: 0;
         }
         
-        .table th {
+        .table thead th {
             background-color: var(--crispy-light);
             color: var(--crispy-dark);
-            font-weight: 600;
+            font-weight: 700;
+            padding: 18px 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             border: none;
-            padding: 15px 12px;
+        }
+        
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(211, 47, 47, 0.05);
+            transform: scale(1.01);
         }
         
         .table td {
+            padding: 18px 15px;
             vertical-align: middle;
             border-color: #e0e0e0;
-            padding: 15px 12px;
         }
         
         .badge {
-            font-weight: 500;
-            padding: 8px 16px;
+            padding: 8px 15px;
             border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
         }
         
         .badge-open {
@@ -299,325 +341,43 @@
             color: #2e7d32;
         }
         
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .action-buttons button {
-            border-radius: 8px;
-            padding: 8px 16px;
+        .action-btn {
+            padding: 6px 12px;
+            margin: 0 3px;
+            border-radius: 6px;
+            font-size: 0.9rem;
             font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
             cursor: pointer;
+            border: none;
         }
         
-        .action-buttons button:hover {
+        .action-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         
-        .form-control, .form-select {
-            border-radius: 8px;
-            border: 2px solid #e0e0e0;
-            padding: 12px 15px;
-            transition: all 0.3s ease;
-            font-weight: 500;
+        .btn-edit {
+            background-color: #ffc107;
+            color: #212529;
         }
         
-        .form-control:focus, .form-select:focus {
-            border-color: var(--crispy-red);
-            box-shadow: 0 0 0 0.25rem rgba(211, 47, 47, 0.25);
-        }
-        
-        .form-popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            z-index: 1000;
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-            border: 2px solid var(--crispy-light);
-        }
-        
-        .form-popup h3 {
-            margin-top: 0;
-            color: var(--crispy-red);
-            border-bottom: 3px solid var(--crispy-light);
-            padding-bottom: 15px;
-            font-weight: 700;
-        }
-        
-        .form-popup label {
-            font-weight: 600;
-            margin-bottom: 8px;
-            display: block;
-            color: var(--text-primary);
-        }
-        
-        .form-popup input, .form-popup select, .form-popup textarea {
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            border: 2px solid #e0e0e0;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-        
-        .form-popup textarea {
-            height: 120px;
-            resize: vertical;
-            min-height: 100px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        .save-btn {
-            background: linear-gradient(135deg, var(--crispy-red), var(--crispy-dark));
+        .btn-email {
+            background-color: #17a2b8;
             color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 15px 30px;
-            width: 100%;
-            font-weight: 700;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
-            cursor: pointer;
         }
         
-        .save-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(211, 47, 47, 0.4);
-        }
-        
-        .evidence-section {
-            margin: 25px 0;
-            padding: 20px;
-            border: 3px dashed var(--crispy-light);
-            border-radius: 12px;
-            background-color: #f8f9fa;
-            transition: all 0.3s ease;
-        }
-        
-        .evidence-section:hover {
-            border-color: var(--crispy-red);
-            background-color: rgba(211, 47, 47, 0.05);
-        }
-        
-        .evidence-section h5 {
-            color: var(--crispy-red);
-            margin-bottom: 20px;
-            font-weight: 700;
-            font-size: 1.2rem;
-        }
-        
-        .file-drop-area {
-            border: 3px dashed #ced4da;
-            border-radius: 12px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background-color: white;
-            margin-bottom: 20px;
-        }
-        
-        .file-drop-area:hover {
-            border-color: var(--crispy-red);
-            background-color: var(--crispy-light);
-            transform: scale(1.02);
-        }
-        
-        .file-drop-area.drag-over {
-            border-color: var(--crispy-red);
-            background-color: rgba(211, 47, 47, 0.1);
-            transform: scale(1.05);
-        }
-        
-        .file-input {
-            display: none;
-        }
-        
-        .file-list {
-            margin-top: 20px;
-        }
-        
-        .file-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border: 2px solid #e0e0e0;
-            transition: all 0.3s ease;
-        }
-        
-        .file-item:hover {
-            border-color: var(--crispy-red);
-            transform: translateX(5px);
-        }
-        
-        .file-item i {
-            color: var(--crispy-red);
-            margin-right: 15px;
-            font-size: 1.2rem;
-        }
-        
-        .file-item button {
-            background: none;
-            border: none;
-            color: var(--crispy-red);
-            cursor: pointer;
-            font-size: 18px;
-            transition: all 0.2s ease;
-            padding: 5px;
-        }
-        
-        .file-item button:hover {
-            transform: scale(1.2);
-            color: var(--crispy-dark);
-        }
-        
-        .evidence-link {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
-        
-        .evidence-link:hover {
-            text-decoration: underline;
-            transform: translateX(5px);
-        }
-        
-        .evidence-none {
-            color: var(--text-secondary);
-            font-style: italic;
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 20px 25px;
-            background-color: white;
-            border-left: 5px solid var(--crispy-red);
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            z-index: 1001;
-            transform: translateX(150%);
-            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            max-width: 350px;
-            border: 2px solid var(--crispy-light);
-        }
-        
-        .notification.show {
-            transform: translateX(0);
-        }
-        
-        .notification i {
-            margin-right: 15px;
-            color: var(--crispy-red);
-            font-size: 1.5rem;
-        }
-        
-        .footer {
-            background-color: var(--crispy-dark);
+        .btn-whatsapp {
+            background-color: #25D366;
             color: white;
-            padding: 30px 0;
-            margin-top: 50px;
-            text-align: center;
-            border-radius: 15px 15px 0 0;
         }
         
-        .filter-section {
-            background-color: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            border: 2px solid var(--crispy-light);
+        .btn-close {
+            background-color: #28a745;
+            color: white;
         }
         
-        .filter-section h5 {
-            color: var(--crispy-red);
-            margin-bottom: 25px;
-            font-weight: 700;
-            font-size: 1.3rem;
-            border-bottom: 2px solid var(--crispy-light);
-            padding-bottom: 10px;
-        }
-        
-        .filter-section .row {
-            margin-bottom: 25px;
-        }
-        
-        .filter-section .form-label {
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--text-primary);
-        }
-        
-        .filter-section button {
-            margin-right: 15px;
-            border-radius: 8px;
-            padding: 12px 24px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            cursor: pointer;
-        }
-        
-        .filter-section button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-        }
-        
-        .table-responsive {
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            border: 2px solid var(--crispy-light);
-        }
-        
-        .table thead th {
-            position: sticky;
-            top: 0;
-            background-color: var(--crispy-light);
-            z-index: 10;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
+        /* Empty State */
         .empty-state {
             text-align: center;
             padding: 60px 40px;
@@ -630,156 +390,177 @@
         .empty-state i {
             font-size: 4rem;
             color: var(--crispy-light);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         
-        .empty-state h5 {
+        .empty-state h3 {
             font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 15px;
             color: var(--text-primary);
         }
         
+        /* Modal Styles */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--crispy-red) 0%, var(--crispy-dark) 100%);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            border: none;
+            padding: 20px 25px;
+        }
+        
+        .modal-header h5 {
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--crispy-red);
+            box-shadow: 0 0 0 0.25rem rgba(211, 47, 47, 0.25);
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .evidence-section {
+            margin: 25px 0;
+            padding: 20px;
+            border: 2px dashed var(--crispy-light);
+            border-radius: 12px;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        
+        .evidence-section:hover {
+            border-color: var(--crispy-red);
+            background-color: rgba(211, 47, 47, 0.05);
+        }
+        
+        .evidence-section h5 {
+            color: var(--crispy-red);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .btn-save {
+            background: linear-gradient(135deg, var(--crispy-red), var(--crispy-dark));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 700;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3);
+        }
+        
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(211, 47, 47, 0.4);
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: var(--crispy-dark);
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+            text-align: center;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 25px;
+            background-color: white;
+            border-left: 5px solid var(--crispy-red);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            z-index: 1050;
+            transform: translateX(150%);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 400px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            border-left-color: #28a745;
+        }
+        
+        .notification.error {
+            border-left-color: #dc3545;
+        }
+        
+        .notification i {
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .notification.success i {
+            color: #28a745;
+        }
+        
+        .notification.error i {
+            color: #dc3545;
+        }
+        
+        /* Responsive */
         @media (max-width: 768px) {
             .navbar-brand {
                 font-size: 1.5rem;
             }
             
-            .navbar-brand i {
-                font-size: 1.8rem;
+            .dashboard-stats {
+                grid-template-columns: 1fr;
             }
             
-            .stats-card h3 {
-                font-size: 2rem;
+            .platform-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .tickets-header {
+                flex-direction: column;
+                align-items: flex-start;
             }
             
             .action-buttons {
-                flex-direction: column;
-            }
-            
-            .action-buttons button {
-                margin-bottom: 10px;
                 width: 100%;
             }
             
-            .form-popup {
-                width: 95%;
-                padding: 20px;
-                max-height: 95vh;
-            }
-            
-            .filter-section {
-                padding: 20px;
-            }
-            
-            .filter-section button {
-                margin-right: 10px;
-                margin-bottom: 10px;
+            .btn-primary {
                 width: 100%;
             }
-            
-            .platform-stats {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        /* Animation for new tickets */
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .new-ticket-row {
-            animation: slideIn 0.5s ease-out;
-        }
-        
-        /* Pulse animation for important buttons */
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7);
-            }
-            70% {
-                box-shadow: 0 0 0 10px rgba(211, 47, 47, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(211, 47, 47, 0);
-            }
-        }
-        
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        /* Fixed textarea height */
-        .form-popup textarea {
-            min-height: 100px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        /* Fixed form popup height */
-        .form-popup {
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        /* Fixed WhatsApp and Email button functionality */
-        .btn-email, .btn-whatsapp {
-            cursor: pointer;
-        }
-        
-        /* Fixed table layout */
-        .table {
-            table-layout: fixed;
-        }
-        
-        .table th:nth-child(5), .table td:nth-child(5) {
-            width: 20%;
-            word-wrap: break-word;
-        }
-        
-        .table th:nth-child(6), .table td:nth-child(6) {
-            width: 15%;
-            word-wrap: break-word;
-        }
-        
-        /* Form overlay */
-        .form-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-        
-        .form-overlay.show {
-            display: block;
-        }
-        
-        /* WhatsApp status indicator */
-        .whatsapp-status {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-        
-        .whatsapp-status.online {
-            background-color: #25D366;
-        }
-        
-        .whatsapp-status.offline {
-            background-color: #gray;
         }
     </style>
 </head>
@@ -809,131 +590,374 @@
             </div>
         </div>
     </nav>
+
     <!-- Main Content -->
     <div class="container">
+        <!-- Dashboard Statistics -->
+        <div class="dashboard-stats">
+            <div class="stat-card total">
+                <h3 id="totalTickets">0</h3>
+                <p>Total Tickets</p>
+            </div>
+            <div class="stat-card open">
+                <h3 id="openTickets">0</h3>
+                <p>Open Tickets</p>
+            </div>
+            <div class="stat-card sent">
+                <h3 id="sentTickets">0</h3>
+                <p>Sent Tickets</p>
+            </div>
+            <div class="stat-card closed">
+                <h3 id="closedTickets">0</h3>
+                <p>Closed Tickets</p>
+            </div>
+        </div>
+
         <!-- Platform Statistics -->
-        <div class="platform-stats">
-            <div class="platform-card noon">
-                <i class="bi bi-cart-check platform-icon"></i>
-                <h3 id="noonCount">0</h3>
-                <p>Noon Orders</p>
-                <div class="percentage" id="noonPercentage">0%</div>
-            </div>
-            <div class="platform-card careem">
-                <i class="bi bi-car-front platform-icon"></i>
-                <h3 id="careemCount">0</h3>
-                <p>Careem Orders</p>
-                <div class="percentage" id="careemPercentage">0%</div>
-            </div>
-        </div>
-        <!-- Stats Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="stats-card total">
-                    <h3 id="totalTickets">0</h3>
-                    <p>Total Tickets</p>
+        <div class="platform-section">
+            <h2 style="color: var(--crispy-dark); margin-bottom: 20px; font-weight: 700;">Platform Distribution</h2>
+            <div class="platform-cards">
+                <div class="platform-card noon">
+                    <i class="bi bi-cart-check platform-icon"></i>
+                    <h3 id="noonCount">0</h3>
+                    <p>Noon Orders</p>
+                    <div class="percentage" id="noonPercentage">0%</div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card open">
-                    <h3 id="openTickets">0</h3>
-                    <p>Open Tickets</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card sent">
-                    <h3 id="sentTickets">0</h3>
-                    <p>Sent Tickets</p>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="stats-card closed">
-                    <h3 id="closedTickets">0</h3>
-                    <p>Closed Tickets</p>
+                <div class="platform-card careem">
+                    <i class="bi bi-car-front platform-icon"></i>
+                    <h3 id="careemCount">0</h3>
+                    <p>Careem Orders</p>
+                    <div class="percentage" id="careemPercentage">0%</div>
                 </div>
             </div>
         </div>
-        <!-- Filters -->
-        <div class="filter-section">
-            <h5><i class="bi bi-funnel"></i> Filters</h5>
-            <div class="row">
-                <div class="col-md-3 mb-3">
-                    <label for="searchOrder" class="form-label">Search Order ID</label>
-                    <input type="text" class="form-control" id="searchOrder" placeholder="Enter Order ID">
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label for="filterBranch" class="form-label">Filter by Branch</label>
-                    <select class="form-select" id="filterBranch">
-                        <option value="">All Branches</option>
-                        <option value="Crispy Chicken Khalidiya">Crispy Chicken Khalidiya</option>
-                        <option value="Crispy Chicken Muroor">Crispy Chicken Muroor</option>
-                        <option value="Crispy Chicken Shabiya 11">Crispy Chicken Shabiya 11</option>
-                        <option value="Crispy Chicken Al Barsha">Crispy Chicken Al Barsha</option>
-                        <option value="Crispy Chicken Al Satwa">Crispy Chicken Al Satwa</option>
-                        <option value="Crispy Chicken Electra">Crispy Chicken Electra</option>
-                        <option value="Crispy Chicken Hamdan">Crispy Chicken Hamdan</option>
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label for="filterPlatform" class="form-label">Filter by Platform</label>
-                    <select class="form-select" id="filterPlatform">
-                        <option value="">All Platforms</option>
-                        <option value="Noon">Noon</option>
-                        <option value="Careem">Careem</option>
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label for="filterStatus" class="form-label">Filter by Status</label>
-                    <select class="form-select" id="filterStatus">
-                        <option value="">All Statuses</option>
-                        <option value="Open">Open</option>
-                        <option value="Sent">Sent</option>
-                        <option value="Closed">Closed</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label for="filterDateFrom" class="form-label">Date From</label>
-                    <input type="date" class="form-control" id="filterDateFrom">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="filterDateTo" class="form-label">Date To</label>
-                    <input type="date" class="form-control" id="filterDateTo">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="filterOrderDate" class="form-label">Order Date</label>
-                    <input type="date" class="form-control" id="filterOrderDate">
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <button class="btn btn-crispy" onclick="applyFilters()">
-                        <i class="bi bi-funnel"></i> Apply Filters
+
+        <!-- Tickets Section -->
+        <div class="tickets-section">
+            <div class="tickets-header">
+                <h2><i class="bi bi-list-task"></i> Complaint Tickets</h2>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="openAddTicketModal()">
+                        <i class="bi bi-plus-circle"></i> Add New Ticket
                     </button>
-                    <button class="btn btn-outline-secondary" onclick="resetFilters()">
-                        <i class="bi bi-x-circle"></i> Reset Filters
+                    <button class="btn btn-outline-primary" onclick="addSampleTicket()">
+                        <i class="bi bi-plus-circle"></i> Add Sample Ticket
                     </button>
-                    <button class="btn btn-outline-primary" onclick="exportToCSV()">
-                        <i class="bi bi-download"></i> Export to CSV
+                    <button class="btn btn-outline-primary" onclick="resetData()">
+                        <i class="bi bi-arrow-clockwise"></i> Reset Data
                     </button>
                 </div>
             </div>
-        </div>
-        <!-- Add New Ticket Button -->
-        <div class="text-center mb-5">
-            <button class="btn btn-crispy btn-lg pulse" onclick="openForm()">
-                <i class="bi bi-plus-circle"></i> Add New Ticket
-            </button>
-        </div>
-        <!-- Tickets Table -->
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0"><i class="bi bi-list-task"></i> Complaint Tickets</h5>
+            
+            <div id="ticketsContainer">
+                <!-- Tickets table will be rendered here -->
             </div>
-            <div class="card-body">
+        </div>
+    </div>
+
+    <!-- Add Ticket Modal -->
+    <div class="modal fade" id="addTicketModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Add New Ticket</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addTicketForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="orderId" class="form-label">Order ID</label>
+                                <input type="text" class="form-control" id="orderId" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="orderDate" class="form-label">Order Date</label>
+                                <input type="date" class="form-control" id="orderDate" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="branch" class="form-label">Branch</label>
+                                <select class="form-select" id="branch" required>
+                                    <option value="">Select Branch</option>
+                                    <option value="Crispy Chicken Khalidiya">Crispy Chicken Khalidiya</option>
+                                    <option value="Crispy Chicken Muroor">Crispy Chicken Muroor</option>
+                                    <option value="Crispy Chicken Shabiya 11">Crispy Chicken Shabiya 11</option>
+                                    <option value="Crispy Chicken Al Barsha">Crispy Chicken Al Barsha</option>
+                                    <option value="Crispy Chicken Al Satwa">Crispy Chicken Al Satwa</option>
+                                    <option value="Crispy Chicken Electra">Crispy Chicken Electra</option>
+                                    <option value="Crispy Chicken Hamdan">Crispy Chicken Hamdan</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="platform" class="form-label">Platform</label>
+                                <select class="form-select" id="platform" required>
+                                    <option value="">Select Platform</option>
+                                    <option value="Noon">Noon</option>
+                                    <option value="Careem">Careem</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="issue" class="form-label">Issue Description</label>
+                            <textarea class="form-control form-textarea" id="issue" required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="compensation" class="form-label">Compensation Value (AED)</label>
+                            <input type="number" class="form-control" id="compensation" min="0" step="0.01" required>
+                        </div>
+                        
+                        <div class="evidence-section">
+                            <h5><i class="bi bi-paperclip"></i> Evidence</h5>
+                            <div class="mb-3">
+                                <label for="evidenceLink" class="form-label">Evidence Link (optional)</label>
+                                <input type="url" class="form-control" id="evidenceLink" placeholder="https://example.com/evidence.jpg">
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="noEvidence">
+                                <label class="form-check-label" for="noEvidence">
+                                    No evidence available
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-save">
+                                <i class="bi bi-check-circle"></i> Save Ticket
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2023 Crispy Chicken Delivery Management System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <i class="bi bi-check-circle-fill"></i>
+        <span id="notificationText">Action completed successfully!</span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let tickets = JSON.parse(localStorage.getItem('crispyTickets')) || [];
+        let filteredTickets = [...tickets];
+        
+        // Function to add sample data
+        function addSampleData() {
+            const sampleTickets = [
+                {
+                    id: Date.now(),
+                    orderId: "NC123456",
+                    orderDate: "2023-11-15",
+                    branch: "Crispy Chicken Khalidiya",
+                    platform: "Noon",
+                    issue: "Food was cold and delivery was late",
+                    compensation: 50.00,
+                    evidence: "https://example.com/evidence.jpg",
+                    status: "Open",
+                    dateCreated: "2023-11-15"
+                },
+                {
+                    id: Date.now() + 1,
+                    orderId: "CR789012",
+                    orderDate: "2023-11-14",
+                    branch: "Crispy Chicken Muroor",
+                    platform: "Careem",
+                    issue: "Wrong order items received",
+                    compensation: 75.00,
+                    evidence: "None",
+                    status: "Sent",
+                    dateCreated: "2023-11-14"
+                },
+                {
+                    id: Date.now() + 2,
+                    orderId: "NC345678",
+                    orderDate: "2023-11-13",
+                    branch: "Crispy Chicken Al Barsha",
+                    platform: "Noon",
+                    issue: "Missing items in the order",
+                    compensation: 30.00,
+                    evidence: "None",
+                    status: "Closed",
+                    dateCreated: "2023-11-13"
+                }
+            ];
+            
+            tickets = sampleTickets;
+            filteredTickets = [...tickets];
+            localStorage.setItem('crispyTickets', JSON.stringify(tickets));
+        }
+        
+        // Reset data function
+        function resetData() {
+            if (confirm('Are you sure you want to reset all data? This will remove all tickets.')) {
+                localStorage.removeItem('crispyTickets');
+                tickets = [];
+                filteredTickets = [];
+                renderTickets();
+                updateStats();
+                updatePlatformStats();
+                showNotification('Data has been reset', 'success');
+            }
+        }
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add sample data if no tickets exist
+            if (tickets.length === 0) {
+                addSampleData();
+            }
+            
+            // Set today's date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('orderDate').value = today;
+            
+            // Initialize
+            renderTickets();
+            updateStats();
+            updatePlatformStats();
+            
+            // Setup form submission
+            document.getElementById('addTicketForm').addEventListener('submit', saveTicket);
+        });
+        
+        // Open add ticket modal
+        function openAddTicketModal() {
+            const modal = new bootstrap.Modal(document.getElementById('addTicketModal'));
+            modal.show();
+        }
+        
+        // Save ticket
+        function saveTicket(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const orderId = document.getElementById('orderId').value.trim();
+            const orderDate = document.getElementById('orderDate').value;
+            const branch = document.getElementById('branch').value;
+            const platform = document.getElementById('platform').value;
+            const issue = document.getElementById('issue').value.trim();
+            const compensation = parseFloat(document.getElementById('compensation').value);
+            const noEvidence = document.getElementById('noEvidence').checked;
+            const evidenceLink = document.getElementById('evidenceLink').value.trim();
+            
+            // Validate
+            if (!orderId || !orderDate || !branch || !platform || !issue || !compensation) {
+                showNotification('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            // Create new ticket
+            const newTicket = {
+                id: Date.now(),
+                orderId,
+                orderDate,
+                branch,
+                platform,
+                issue,
+                compensation,
+                evidence: noEvidence ? 'None' : evidenceLink,
+                status: 'Open',
+                dateCreated: new Date().toISOString().split('T')[0]
+            };
+            
+            // Add to tickets
+            tickets.unshift(newTicket);
+            filteredTickets = [...tickets];
+            
+            // Save to localStorage
+            localStorage.setItem('crispyTickets', JSON.stringify(tickets));
+            
+            // Update UI
+            renderTickets();
+            updateStats();
+            updatePlatformStats();
+            
+            // Close modal and reset form
+            bootstrap.Modal.getInstance(document.getElementById('addTicketModal')).hide();
+            document.getElementById('addTicketForm').reset();
+            
+            // Show notification
+            showNotification('Ticket added successfully!', 'success');
+        }
+        
+        // Add sample ticket
+        function addSampleTicket() {
+            const sampleTickets = [
+                {
+                    id: Date.now(),
+                    orderId: `NC${Math.floor(Math.random() * 900000) + 100000}`,
+                    orderDate: new Date().toISOString().split('T')[0],
+                    branch: "Crispy Chicken Khalidiya",
+                    platform: "Noon",
+                    issue: "Food was cold and delivery was late",
+                    compensation: 50.00,
+                    evidence: "None",
+                    status: "Open",
+                    dateCreated: new Date().toISOString().split('T')[0]
+                },
+                {
+                    id: Date.now() + 1,
+                    orderId: `CR${Math.floor(Math.random() * 900000) + 100000}`,
+                    orderDate: new Date().toISOString().split('T')[0],
+                    branch: "Crispy Chicken Muroor",
+                    platform: "Careem",
+                    issue: "Wrong order items received",
+                    compensation: 75.00,
+                    evidence: "None",
+                    status: "Open",
+                    dateCreated: new Date().toISOString().split('T')[0]
+                }
+            ];
+            
+            // Add sample tickets
+            sampleTickets.forEach(ticket => {
+                tickets.unshift(ticket);
+            });
+            
+            filteredTickets = [...tickets];
+            localStorage.setItem('crispyTickets', JSON.stringify(tickets));
+            
+            // Update UI
+            renderTickets();
+            updateStats();
+            updatePlatformStats();
+            
+            showNotification('Sample tickets added successfully!', 'success');
+        }
+        
+        // Render tickets
+        function renderTickets() {
+            const container = document.getElementById('ticketsContainer');
+            
+            if (filteredTickets.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-inbox"></i>
+                        <h3>No tickets found</h3>
+                        <p>Add your first complaint ticket using the button above</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Create table
+            let tableHTML = `
                 <div class="table-responsive">
-                    <table class="table table-hover" id="ticketsTable">
+                    <table class="table table-hover">
                         <thead>
                             <tr>
                                 <th>Order ID</th>
@@ -944,248 +968,243 @@
                                 <th>Evidence</th>
                                 <th>Status</th>
                                 <th>Compensation</th>
-                                <th>Date Created</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody>
+            `;
+            
+            // Add tickets to table
+            filteredTickets.forEach(ticket => {
+                const statusClass = `badge-${ticket.status.toLowerCase()}`;
+                const evidenceText = ticket.evidence === 'None' ? 
+                    '<span class="text-muted">No evidence</span>' : 
+                    `<a href="${ticket.evidence}" class="text-primary" target="_blank">${ticket.evidence}</a>`;
+                
+                tableHTML += `
+                    <tr>
+                        <td><strong>${ticket.orderId}</strong></td>
+                        <td>${ticket.orderDate}</td>
+                        <td>${ticket.branch}</td>
+                        <td>${ticket.platform}</td>
+                        <td>${ticket.issue}</td>
+                        <td>${evidenceText}</td>
+                        <td><span class="badge ${statusClass}">${ticket.status}</span></td>
+                        <td>AED ${ticket.compensation.toFixed(2)}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn btn-edit" onclick="editTicket(${ticket.id})">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </button>
+                                <button class="action-btn btn-email" onclick="sendEmail(${ticket.id})">
+                                    <i class="bi bi-envelope"></i> Email
+                                </button>
+                                <button class="action-btn btn-whatsapp" onclick="sendWhatsApp(${ticket.id})">
+                                    <i class="bi bi-whatsapp"></i> WhatsApp
+                                </button>
+                                <button class="action-btn btn-close" onclick="closeTicket(${ticket.id})">
+                                    <i class="bi bi-check-circle"></i> Close
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += `
+                        </tbody>
                     </table>
                 </div>
-                <div id="emptyState" class="empty-state" style="display: none;">
-                    <i class="bi bi-inbox"></i>
-                    <h5>No tickets found</h5>
-                    <p>Add your first complaint ticket using the button above</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Form Overlay -->
-    <div class="form-overlay" id="formOverlay" onclick="closeForm()"></div>
-    
-    <!-- Add Ticket Form -->
-    <div class="form-popup" id="orderForm">
-        <h3><i class="bi bi-plus-circle"></i> Add New Ticket</h3>
-        <label>Order ID</label>
-        <input type="text" id="orderId" required>
-        
-        <label>Order Date</label>
-        <input type="date" id="orderDate" required>
-        
-        <label>Branch</label>
-        <select id="branch" required>
-            <option value="">Select Branch</option>
-            <option value="Crispy Chicken Khalidiya">Crispy Chicken Khalidiya</option>
-            <option value="Crispy Chicken Muroor">Crispy Chicken Muroor</option>
-            <option value="Crispy Chicken Shabiya 11">Crispy Chicken Shabiya 11</option>
-            <option value="Crispy Chicken Al Barsha">Crispy Chicken Al Barsha</option>
-            <option value="Crispy Chicken Al Satwa">Crispy Chicken Al Satwa</option>
-            <option value="Crispy Chicken Electra">Crispy Chicken Electra</option>
-            <option value="Crispy Chicken Hamdan">Crispy Chicken Hamdan</option>
-        </select>
-        
-        <label>Platform</label>
-        <select id="platform" required>
-            <option value="">Select Platform</option>
-            <option value="Noon">Noon</option>
-            <option value="Careem">Careem</option>
-        </select>
-        
-        <label>Issue Description</label>
-        <textarea id="issue" required></textarea>
-        
-        <label>Compensation Value (AED)</label>
-        <input type="number" id="compensation" placeholder="Enter compensation amount" min="0" step="0.01" required>
-        
-        <div class="evidence-section">
-            <h5><i class="bi bi-paperclip"></i> Evidence Upload</h5>
-            <p class="text-muted mb-3">Upload photos, videos, or other evidence files to support your claim</p>
+            `;
             
-            <div class="file-drop-area" id="fileDropArea">
-                <i class="bi bi-cloud-upload fs-1 text-muted"></i>
-                <p class="mb-2">Drag & drop files here or click to browse</p>
-                <small class="text-muted">Supported formats: JPG, PNG, PDF, MP4 (Max 10MB)</small>
-                <input type="file" class="file-input" id="fileInput" multiple accept=".jpg,.jpeg,.png,.pdf,.mp4">
-            </div>
+            container.innerHTML = tableHTML;
+        }
+        
+        // Update statistics
+        function updateStats() {
+            const total = tickets.length;
+            const open = tickets.filter(t => t.status === 'Open').length;
+            const sent = tickets.filter(t => t.status === 'Sent').length;
+            const closed = tickets.filter(t => t.status === 'Closed').length;
             
-            <div class="file-list" id="fileList"></div>
+            document.getElementById('totalTickets').textContent = total;
+            document.getElementById('openTickets').textContent = open;
+            document.getElementById('sentTickets').textContent = sent;
+            document.getElementById('closedTickets').textContent = closed;
+        }
+        
+        // Update platform statistics
+        function updatePlatformStats() {
+            const noonTickets = tickets.filter(t => t.platform === 'Noon');
+            const careemTickets = tickets.filter(t => t.platform === 'Careem');
             
-            <div class="mt-3">
-                <label class="form-label">Or provide a link to evidence:</label>
-                <input type="url" class="form-control" id="evidenceLink" placeholder="https://example.com/evidence.jpg">
-                <div class="form-check mt-2">
-                    <input class="form-check-input" type="checkbox" id="noEvidence">
-                    <label class="form-check-label" for="noEvidence">
-                        No evidence available
-                    </label>
-                </div>
-            </div>
-        </div>
-        
-        <div class="d-flex gap-3 mt-4">
-            <button class="btn btn-crispy" onclick="saveTicket()">
-                <i class="bi bi-check-circle"></i> Save Ticket
-            </button>
-            <button class="btn btn-outline-secondary" onclick="closeForm()">
-                <i class="bi bi-x-circle"></i> Cancel
-            </button>
-        </div>
-    </div>
-    
-    <!-- Edit Ticket Form -->
-    <div class="form-popup" id="editTicketForm">
-        <h3><i class="bi bi-pencil"></i> Edit Ticket</h3>
-        <input type="hidden" id="editTicketId">
-        
-        <label>Order ID</label>
-        <input type="text" id="editOrderId" required>
-        
-        <label>Order Date</label>
-        <input type="date" id="editOrderDate" required>
-        
-        <label>Branch</label>
-        <select id="editBranch" required>
-            <option value="">Select Branch</option>
-            <option value="Crispy Chicken Khalidiya">Crispy Chicken Khalidiya</option>
-            <option value="Crispy Chicken Muroor">Crispy Chicken Muroor</option>
-            <option value="Crispy Chicken Shabiya 11">Crispy Chicken Shabiya 11</option>
-            <option value="Crispy Chicken Al Barsha">Crispy Chicken Al Barsha</option>
-            <option value="Crispy Chicken Al Satwa">Crispy Chicken Al Satwa</option>
-            <option value="Crispy Chicken Electra">Crispy Chicken Electra</option>
-            <option value="Crispy Chicken Hamdan">Crispy Chicken Hamdan</option>
-        </select>
-        
-        <label>Platform</label>
-        <select id="editPlatform" required>
-            <option value="">Select Platform</option>
-            <option value="Noon">Noon</option>
-            <option value="Careem">Careem</option>
-        </select>
-        
-        <label>Issue Description</label>
-        <textarea id="editIssue" required></textarea>
-        
-        <label>Compensation Value (AED)</label>
-        <input type="number" id="editCompensation" placeholder="Enter compensation amount" min="0" step="0.01" required>
-        
-        <div class="evidence-section">
-            <h5><i class="bi bi-paperclip"></i> Evidence</h5>
-            <label class="form-label">Evidence (link or description):</label>
-            <input type="text" class="form-control" id="editEvidence">
-            <div class="form-check mt-2">
-                <input class="form-check-input" type="checkbox" id="editNoEvidence">
-                <label class="form-check-label" for="editNoEvidence">
-                    No evidence available
-                </label>
-            </div>
-        </div>
-        
-        <div class="d-flex gap-3 mt-4">
-            <button class="btn btn-crispy" onclick="saveEditedTicket()">
-                <i class="bi bi-check-circle"></i> Save Changes
-            </button>
-            <button class="btn btn-outline-secondary" onclick="closeEditForm()">
-                <i class="bi bi-x-circle"></i> Cancel
-            </button>
-        </div>
-    </div>
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2023 Crispy Chicken Delivery Management System. All rights reserved.</p>
-        </div>
-    </footer>
-    <!-- Notification -->
-    <div id="notification" class="notification">
-        <i class="bi bi-check-circle-fill"></i>
-        <span id="notificationText">Action completed successfully!</span>
-    </div>
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Global variables
-        let tickets = JSON.parse(localStorage.getItem('crispyTickets')) || [];
-        let filteredTickets = [...tickets];
-        let uploadedFiles = [];
-        
-        // WhatsApp branch numbers
-        const branchNumbers = {
-            "Crispy Chicken Khalidiya": "971569494764",
-            "Crispy Chicken Muroor": "971505414641",
-            "Crispy Chicken Shabiya 11": "971562690688",
-            "Crispy Chicken Al Barsha": "971569659524",
-            "Crispy Chicken Al Satwa": "971567970685",
-            "Crispy Chicken Electra": "971563866859",
-            "Crispy Chicken Hamdan": "971556886650"
-        };
-        
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing...');
+            const total = tickets.length;
+            const noonCount = noonTickets.length;
+            const careemCount = careemTickets.length;
             
-            // Test function availability
-            console.log('Function availability:', {
-                openForm: typeof openForm,
-                closeForm: typeof closeForm,
-                saveTicket: typeof saveTicket
-            });
+            document.getElementById('noonCount').textContent = noonCount;
+            document.getElementById('careemCount').textContent = careemCount;
+            
+            // Calculate percentages
+            const noonPercentage = total > 0 ? ((noonCount / total) * 100).toFixed(1) : 0;
+            const careemPercentage = total > 0 ? ((careemCount / total) * 100).toFixed(1) : 0;
+            
+            document.getElementById('noonPercentage').textContent = `${noonPercentage}%`;
+            document.getElementById('careemPercentage').textContent = `${careemPercentage}%`;
+        }
+        
+        // Edit ticket
+        function editTicket(ticketId) {
+            const ticket = tickets.find(t => t.id === ticketId);
+            if (!ticket) return;
+            
+            // Populate form with ticket data
+            document.getElementById('orderId').value = ticket.orderId;
+            document.getElementById('orderDate').value = ticket.orderDate;
+            document.getElementById('branch').value = ticket.branch;
+            document.getElementById('platform').value = ticket.platform;
+            document.getElementById('issue').value = ticket.issue;
+            document.getElementById('compensation').value = ticket.compensation;
+            document.getElementById('evidenceLink').value = ticket.evidence === 'None' ? '' : ticket.evidence;
+            document.getElementById('noEvidence').checked = ticket.evidence === 'None';
+            
+            // Show modal
+            openAddTicketModal();
+            
+            // Update save function to edit existing ticket
+            const form = document.getElementById('addTicketForm');
+            form.onsubmit = function(e) {
+                e.preventDefault();
+                
+                // Update ticket
+                ticket.orderId = document.getElementById('orderId').value.trim();
+                ticket.orderDate = document.getElementById('orderDate').value;
+                ticket.branch = document.getElementById('branch').value;
+                ticket.platform = document.getElementById('platform').value;
+                ticket.issue = document.getElementById('issue').value.trim();
+                ticket.compensation = parseFloat(document.getElementById('compensation').value);
+                ticket.evidence = document.getElementById('noEvidence').checked ? 'None' : document.getElementById('evidenceLink').value.trim();
+                
+                // Save to localStorage
+                localStorage.setItem('crispyTickets', JSON.stringify(tickets));
+                
+                // Update UI
+                renderTickets();
+                updateStats();
+                updatePlatformStats();
+                
+                // Close modal and reset form
+                bootstrap.Modal.getInstance(document.getElementById('addTicketModal')).hide();
+                form.reset();
+                form.onsubmit = saveTicket; // Reset to original save function
+                
+                showNotification('Ticket updated successfully!', 'success');
+            };
+        }
+        
+        // Close ticket
+        function closeTicket(ticketId) {
+            if (!confirm('Are you sure you want to close this ticket?')) return;
+            
+            const ticket = tickets.find(t => t.id === ticketId);
+            if (ticket) {
+                ticket.status = 'Closed';
+                localStorage.setItem('crispyTickets', JSON.stringify(tickets));
+                
+                renderTickets();
+                updateStats();
+                updatePlatformStats();
+                
+                showNotification('Ticket closed successfully!', 'success');
+            }
+        }
+        
+        // Send email
+        function sendEmail(ticketId) {
+            const ticket = tickets.find(t => t.id === ticketId);
+            if (!ticket) return;
+            
+            const subject = `Complaint Regarding Order ${ticket.orderId}`;
+            const body = `Dear Customer,\n\nWe are writing regarding your complaint about order ${ticket.orderId} from ${ticket.branch}.\n\nIssue: ${ticket.issue}\n\nWe are investigating this matter and will get back to you shortly.\n\nThank you,\nCrispy Chicken Team`;
+            
+            const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = mailtoLink;
+            
+            // Update ticket status
+            ticket.status = 'Sent';
+            localStorage.setItem('crispyTickets', JSON.stringify(tickets));
             
             renderTickets();
             updateStats();
             updatePlatformStats();
-            initFileUpload();
             
-            // Set today's date as default for order date
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('orderDate').value = today;
-            
-            // Search functionality
-            document.getElementById('searchOrder').addEventListener('input', function() {
-                applyFilters();
-            });
-            
-            // Filter change events
-            document.getElementById('filterBranch').addEventListener('change', applyFilters);
-            document.getElementById('filterPlatform').addEventListener('change', applyFilters);
-            document.getElementById('filterStatus').addEventListener('change', applyFilters);
-            document.getElementById('filterDateFrom').addEventListener('change', applyFilters);
-            document.getElementById('filterDateTo').addEventListener('change', applyFilters);
-            document.getElementById('filterOrderDate').addEventListener('change', applyFilters);
-            
-            // Test button
-            const testButton = document.createElement('button');
-            testButton.className = 'btn btn-info mt-3';
-            testButton.innerHTML = '<i class="bi bi-bug"></i> Test Functions';
-            testButton.onclick = testFunctions;
-            document.querySelector('.container').appendChild(testButton);
-        });
-        
-        // Test functions
-        function testFunctions() {
-            console.log('Testing functions...');
-            alert('Testing functions...\n\n' +
-                  'openForm: ' + (typeof openForm) + '\n' +
-                  'closeForm: ' + (typeof closeForm) + '\n' +
-                  'saveTicket: ' + (typeof saveTicket) + '\n\n' +
-                  'Tickets count: ' + tickets.length + '\n' +
-                  'Branch numbers count: ' + Object.keys(branchNumbers).length);
-            
-            // Test form visibility
-            openForm();
+            showNotification('Email client opened!', 'success');
         }
         
-        // Open form
-        function openForm() {
-            console.log('Opening form...');
-            const form = document.getElementById('orderForm');
-            const overlay = document.getElementById('formOverlay');
+        // Send WhatsApp
+        function sendWhatsApp(ticketId) {
+            const ticket = tickets.find(t => t.id === ticketId);
+            if (!ticket) return;
             
-            // Reset form
-            resetForm();
+            const branchNumbers = {
+                "Crispy Chicken Khalidiya": "971569494764",
+                "Crispy Chicken Muroor": "971505414641",
+                "Crispy Chicken Shabiya 11": "971562690688",
+                "Crispy Chicken Al Barsha": "971569659524",
+                "Crispy Chicken Al Satwa": "971567970685",
+                "Crispy Chicken Electra": "971563866859",
+                "Crispy Chicken Hamdan": "971556886650"
+            };
             
-            // Show form and overlay
-            form.style.display = 'block';
-            overlay.classList.add('show');
+            const branchNumber = branchNumbers[ticket.branch];
+            if (!branchNumber) {
+                showNotification('WhatsApp number not available for this branch', 'error');
+                return;
+            }
             
-            // Set today's date
-            const today = new Date().toISOString().split('T')[0
+            const message = `Hi, I'm writing about my order ${ticket.orderId} from ${ticket.branch}. The issue was: ${ticket.issue}. Please assist.`;
+            const whatsappUrl = `https://wa.me/${branchNumber}?text=${encodeURIComponent(message)}`;
+            
+            window.open(whatsappUrl, '_blank');
+            
+            // Update ticket status
+            ticket.status = 'Sent';
+            localStorage.setItem('crispyTickets', JSON.stringify(tickets));
+            
+            renderTickets();
+            updateStats();
+            updatePlatformStats();
+            
+            showNotification('WhatsApp opened!', 'success');
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            const icon = notification.querySelector('i');
+            
+            // Set message
+            notificationText.textContent = message;
+            
+            // Set type
+            notification.className = 'notification';
+            if (type === 'error') {
+                notification.classList.add('error');
+                icon.className = 'bi bi-exclamation-circle-fill';
+            } else {
+                notification.classList.add('success');
+                icon.className = 'bi bi-check-circle-fill';
+            }
+            
+            // Show notification
+            notification.classList.add('show');
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>    h
