@@ -82,19 +82,18 @@
 </div>
 
 <script>
-  // بيانات أولية كمثال
+  // بيانات أولية كمثال + رقم WhatsApp
   let compData = [
-    {orderId:'127822175',date:'9/2/2025',branch:'Hamdan',platform:'Careem',issue:'Wrong item',evidence:'',status:'Open',comp:12.99},
-    {orderId:'127822223',date:'9/2/2025',branch:'Al Barsha',platform:'Careem',issue:'Food not edible',evidence:'https://files.fm/u/pk8m5nzdj2',status:'Open',comp:21.70},
-    {orderId:'127841536',date:'9/2/2025',branch:'Hamdan',platform:'Careem',issue:'Missing side item',evidence:'https://files.fm/u/pk8m5nzdj2',status:'Open',comp:6.00},
+    {orderId:'127822175',date:'9/2/2025',branch:'Hamdan',platform:'Careem',issue:'Wrong item',evidence:'',status:'Open',comp:12.99,phone:'+971501234567'},
+    {orderId:'127822223',date:'9/2/2025',branch:'Al Barsha',platform:'Careem',issue:'Food not edible',evidence:'https://files.fm/u/pk8m5nzdj2',status:'Open',comp:21.70,phone:'+971509876543'},
+    {orderId:'127841536',date:'9/2/2025',branch:'Hamdan',platform:'Careem',issue:'Missing side item',evidence:'https://files.fm/u/pk8m5nzdj2',status:'Open',comp:6.00,phone:'+971501112233'},
     // يمكن إضافة باقي البيانات هنا
   ];
 
-  // حفظ واسترجاع البيانات
   if(localStorage.getItem('compData')) compData=JSON.parse(localStorage.getItem('compData'));
+
   function saveData(){ localStorage.setItem('compData',JSON.stringify(compData)); renderDashboard(); renderChart(); }
 
-  // إنشاء الجدول
   const tbody = document.querySelector('#compTable tbody');
   function renderTable(){
     tbody.innerHTML='';
@@ -138,13 +137,18 @@
 
       // أزرار تفاعلية
       tr.querySelector('.edit').addEventListener('click', ()=>alert(`Edit: ${row.orderId}`));
-      tr.querySelector('.whatsapp').addEventListener('click', ()=>alert(`Send WhatsApp: ${row.orderId}`));
+
+      // WhatsApp: إرسال رسالة جاهزة
+      tr.querySelector('.whatsapp').addEventListener('click', ()=>{
+        const message = encodeURIComponent(`مرحباً، بخصوص طلب رقم ${row.orderId}، الحالة: ${row.status}, التعويض: ${row.comp} AED`);
+        window.open(`https://wa.me/${row.phone.replace(/\+/g,'')}?text=${message}`, '_blank');
+      });
+
       tr.querySelector('.email').addEventListener('click', ()=>alert(`Send Email: ${row.orderId}`));
       tr.querySelector('.close').addEventListener('click', ()=>{ row.status='Closed'; saveData(); renderTable(); });
     });
   }
 
-  // Dashboard
   function renderDashboard(){
     document.getElementById('totalOrders').innerText=compData.length;
     document.getElementById('openOrders').innerText=compData.filter(r=>r.status==='Open').length;
@@ -152,7 +156,6 @@
     document.getElementById('totalComp').innerText=compData.reduce((a,b)=>a+b.comp,0).toFixed(2)+' AED';
   }
 
-  // الرسم البياني
   const ctx=document.getElementById('compChart').getContext('2d');
   let compChart;
   function renderChart(){
@@ -164,11 +167,9 @@
     compChart=new Chart(ctx,{type:'bar',data:{labels,datasets:[{label:'إجمالي التعويض (AED)',data,backgroundColor:'#ff9800'}]},options:{responsive:true,plugins:{legend:{display:false}}}});
   }
 
-  // البدء
   renderTable();
   renderDashboard();
   renderChart();
-
 </script>
 
 </body>
