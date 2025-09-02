@@ -1,217 +1,1191 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Compensation Tickets Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/heatmapjs@2.0.5/heatmap.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <style>
-    .dock {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: flex-end;
-      z-index: 1000;
-      cursor: grab;
-    }
-    .dock-buttons { display: none; flex-direction: column; gap: 8px; }
-    .dock-buttons.show { display: flex; }
-    #heatmapContainer { position: fixed; top:0; left:0; width:100%; height:100%; z-index:999; pointer-events:none; display:none; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crispy Chicken - Complaints Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --crispy-red: #d32f2f;
+            --crispy-dark: #b71c1c;
+            --crispy-light: #ffcdd2;
+            --bg-light: #fafafa;
+            --bg-dark: #f5f5f5;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --noon-color: #FFB800;
+            --careem-color: #00A86B;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--crispy-red) 0%, var(--crispy-dark) 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            padding: 15px 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: white !important;
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand i {
+            margin-right: 10px;
+            font-size: 2.2rem;
+        }
+        
+        .container {
+            padding: 20px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            background-color: white;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--crispy-red) 0%, var(--crispy-dark) 100%);
+            color: white;
+            font-weight: 600;
+            padding: 15px 20px;
+            border: none;
+        }
+        
+        .btn-crispy {
+            background-color: var(--crispy-red);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+        
+        .btn-crispy:hover {
+            background-color: var(--crispy-dark);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+        
+        .btn-email {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .btn-email:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,123,255,0.4);
+        }
+        
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(37,211,102,0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .btn-whatsapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37,211,102,0.4);
+        }
+        
+        .btn-close-ticket {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(220,53,69,0.3);
+            cursor: pointer;
+        }
+        
+        .btn-close-ticket:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(220,53,69,0.4);
+        }
+        
+        .btn-edit {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #212529;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(255,193,7,0.3);
+            cursor: pointer;
+        }
+        
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(255,193,7,0.4);
+        }
+        
+        .stats-card {
+            border-left: 5px solid var(--crispy-red);
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        
+        .stats-card:hover {
+            transform: translateX(5px);
+        }
+        
+        .stats-card h3 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .stats-card p {
+            margin: 5px 0 0;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .stats-card.total h3 { color: var(--crispy-red); }
+        .stats-card.open h3 { color: #0d47a1; }
+        .stats-card.sent h3 { color: #ff8f00; }
+        .stats-card.closed h3 { color: #2e7d32; }
+        
+        .platform-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .platform-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+        
+        .platform-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .platform-card.noon {
+            border-color: var(--noon-color);
+        }
+        
+        .platform-card.careem {
+            border-color: var(--careem-color);
+        }
+        
+        .platform-card h3 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+        
+        .platform-card.noon h3 {
+            color: var(--noon-color);
+        }
+        
+        .platform-card.careem h3 {
+            color: var(--careem-color);
+        }
+        
+        .platform-card .platform-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+        
+        .platform-card.noon .platform-icon {
+            color: var(--noon-color);
+        }
+        
+        .platform-card.careem .platform-icon {
+            color: var(--careem-color);
+        }
+        
+        .platform-card .percentage {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-top: 10px;
+        }
+        
+        .table {
+            color: var(--text-primary);
+        }
+        
+        .table th {
+            background-color: var(--crispy-light);
+            color: var(--crispy-dark);
+            font-weight: 600;
+            border: none;
+            padding: 15px 12px;
+        }
+        
+        .table td {
+            vertical-align: middle;
+            border-color: #e0e0e0;
+            padding: 15px 12px;
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+        
+        .badge-open {
+            background-color: #e3f2fd;
+            color: #0d47a1;
+        }
+        
+        .badge-sent {
+            background-color: #fff8e1;
+            color: #ff8f00;
+        }
+        
+        .badge-closed {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .action-buttons button {
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        
+        .action-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--crispy-red);
+            box-shadow: 0 0 0 0.25rem rgba(211, 47, 47, 0.25);
+        }
+        
+        .form-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            z-index: 1000;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 2px solid var(--crispy-light);
+        }
+        
+        .form-popup h3 {
+            margin-top: 0;
+            color: var(--crispy-red);
+            border-bottom: 3px solid var(--crispy-light);
+            padding-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .form-popup label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            color: var(--text-primary);
+        }
+        
+        .form-popup input, .form-popup select, .form-popup textarea {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .form-popup textarea {
+            height: 120px;
+            resize: vertical;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .save-btn {
+            background: linear-gradient(135deg, var(--crispy-red), var(--crispy-dark));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 15px 30px;
+            width: 100%;
+            font-weight: 700;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+            cursor: pointer;
+        }
+        
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(211, 47, 47, 0.4);
+        }
+        
+        .evidence-section {
+            margin: 25px 0;
+            padding: 20px;
+            border: 3px dashed var(--crispy-light);
+            border-radius: 12px;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        
+        .evidence-section:hover {
+            border-color: var(--crispy-red);
+            background-color: rgba(211, 47, 47, 0.05);
+        }
+        
+        .evidence-section h5 {
+            color: var(--crispy-red);
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .file-drop-area {
+            border: 3px dashed #ced4da;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: white;
+            margin-bottom: 20px;
+        }
+        
+        .file-drop-area:hover {
+            border-color: var(--crispy-red);
+            background-color: var(--crispy-light);
+            transform: scale(1.02);
+        }
+        
+        .file-drop-area.drag-over {
+            border-color: var(--crispy-red);
+            background-color: rgba(211, 47, 47, 0.1);
+            transform: scale(1.05);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-list {
+            margin-top: 20px;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .file-item:hover {
+            border-color: var(--crispy-red);
+            transform: translateX(5px);
+        }
+        
+        .file-item i {
+            color: var(--crispy-red);
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .file-item button {
+            background: none;
+            border: none;
+            color: var(--crispy-red);
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s ease;
+            padding: 5px;
+        }
+        
+        .file-item button:hover {
+            transform: scale(1.2);
+            color: var(--crispy-dark);
+        }
+        
+        .evidence-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .evidence-link:hover {
+            text-decoration: underline;
+            transform: translateX(5px);
+        }
+        
+        .evidence-none {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 25px;
+            background-color: white;
+            border-left: 5px solid var(--crispy-red);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            z-index: 1001;
+            transform: translateX(150%);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 350px;
+            border: 2px solid var(--crispy-light);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification i {
+            margin-right: 15px;
+            color: var(--crispy-red);
+            font-size: 1.5rem;
+        }
+        
+        .footer {
+            background-color: var(--crispy-dark);
+            color: white;
+            padding: 30px 0;
+            margin-top: 50px;
+            text-align: center;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .filter-section {
+            background-color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 2px solid var(--crispy-light);
+        }
+        
+        .filter-section h5 {
+            color: var(--crispy-red);
+            margin-bottom: 25px;
+            font-weight: 700;
+            font-size: 1.3rem;
+            border-bottom: 2px solid var(--crispy-light);
+            padding-bottom: 10px;
+        }
+        
+        .filter-section .row {
+            margin-bottom: 25px;
+        }
+        
+        .filter-section .form-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+        
+        .filter-section button {
+            margin-right: 15px;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        
+        .filter-section button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+        
+        .table-responsive {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border: 2px solid var(--crispy-light);
+        }
+        
+        .table thead th {
+            position: sticky;
+            top: 0;
+            background-color: var(--crispy-light);
+            z-index: 10;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 40px;
+            color: var(--text-secondary);
+            border-radius: 15px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border: 2px dashed var(--crispy-light);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--crispy-light);
+            margin-bottom: 25px;
+        }
+        
+        .empty-state h5 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+        
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+            
+            .navbar-brand i {
+                font-size: 1.8rem;
+            }
+            
+            .stats-card h3 {
+                font-size: 2rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons button {
+                margin-bottom: 10px;
+                width: 100%;
+            }
+            
+            .form-popup {
+                width: 95%;
+                padding: 20px;
+                max-height: 95vh;
+            }
+            
+            .filter-section {
+                padding: 20px;
+            }
+            
+            .filter-section button {
+                margin-right: 10px;
+                margin-bottom: 10px;
+                width: 100%;
+            }
+            
+            .platform-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animation for new tickets */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .new-ticket-row {
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        /* Pulse animation for important buttons */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(211, 47, 47, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(211, 47, 47, 0);
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Fixed textarea height */
+        .form-popup textarea {
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        /* Fixed form popup height */
+        .form-popup {
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        /* Fixed WhatsApp and Email button functionality */
+        .btn-email, .btn-whatsapp {
+            cursor: pointer;
+        }
+        
+        /* Fixed table layout */
+        .table {
+            table-layout: fixed;
+        }
+        
+        .table th:nth-child(5), .table td:nth-child(5) {
+            width: 20%;
+            word-wrap: break-word;
+        }
+        
+        .table th:nth-child(6), .table td:nth-child(6) {
+            width: 15%;
+            word-wrap: break-word;
+        }
+        
+        /* Form overlay */
+        .form-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        
+        .form-overlay.show {
+            display: block;
+        }
+        
+        /* WhatsApp status indicator */
+        .whatsapp-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .whatsapp-status.online {
+            background-color: #25D366;
+        }
+        
+        .whatsapp-status.offline {
+            background-color: #gray;
+        }
+    </style>
 </head>
-<body class="bg-gray-50 p-6">
-
-  <!-- Header -->
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">📑 Compensation Tickets</h1>
-  </div>
-
-  <!-- Tickets Table -->
-  <div class="bg-white shadow rounded-lg p-4 overflow-x-auto">
-    <table id="ticketsTable" class="min-w-full border-collapse">
-      <thead>
-        <tr class="text-left text-gray-700 border-b">
-          <th class="py-2 px-3">Order ID</th>
-          <th class="py-2 px-3">Order Date</th>
-          <th class="py-2 px-3">Branch</th>
-          <th class="py-2 px-3">Platform</th>
-          <th class="py-2 px-3">Issue</th>
-        </tr>
-      </thead>
-      <tbody id="ticketsBody"></tbody>
-    </table>
-  </div>
-
-  <!-- Charts Section -->
-  <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-    <div class="bg-white p-4 rounded-lg shadow">
-      <h2 class="text-lg font-semibold mb-2">Complaints by Branch</h2>
-      <canvas id="barChart"></canvas>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-fire"></i>
+                Crispy Chicken Complaints Dashboard
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="bi bi-speedometer2"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-list-task"></i> Tickets</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-graph-up"></i> Reports</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Platform Statistics -->
+        <div class="platform-stats">
+            <div class="platform-card noon">
+                <i class="bi bi-cart-check platform-icon"></i>
+                <h3 id="noonCount">0</h3>
+                <p>Noon Orders</p>
+                <div class="percentage" id="noonPercentage">0%</div>
+            </div>
+            <div class="platform-card careem">
+                <i class="bi bi-car-front platform-icon"></i>
+                <h3 id="careemCount">0</h3>
+                <p>Careem Orders</p>
+                <div class="percentage" id="careemPercentage">0%</div>
+            </div>
+        </div>
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card total">
+                    <h3 id="totalTickets">0</h3>
+                    <p>Total Tickets</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card open">
+                    <h3 id="openTickets">0</h3>
+                    <p>Open Tickets</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card sent">
+                    <h3 id="sentTickets">0</h3>
+                    <p>Sent Tickets</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card closed">
+                    <h3 id="closedTickets">0</h3>
+                    <p>Closed Tickets</p>
+                </div>
+            </div>
+        </div>
+        <!-- Filters -->
+        <div class="filter-section">
+            <h5><i class="bi bi-funnel"></i> Filters</h5>
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label for="searchOrder" class="form-label">Search Order ID</label>
+                    <input type="text" class="form-control" id="searchOrder" placeholder="Enter Order ID">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="filterBranch" class="form-label">Filter by Branch</label>
+                    <select class="form-select" id="filterBranch">
+                        <option value="">All Branches</option>
+                        <option value="Crispy Chicken Khalidiya">Crispy Chicken Khalidiya</option>
+                        <option value="Crispy Chicken Muroor">Crispy Chicken Muroor</option>
+                        <option value="Crispy Chicken Shabiya 11">Crispy Chicken Shabiya 11</option>
+                        <option value="Crispy Chicken Al Barsha">Crispy Chicken Al Barsha</option>
+                        <option value="Crispy Chicken Al Satwa">Crispy Chicken Al Satwa</option>
+                        <option value="Crispy Chicken Electra">Crispy Chicken Electra</option>
+                        <option value="Crispy Chicken Hamdan">Crispy Chicken Hamdan</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="filterPlatform" class="form-label">Filter by Platform</label>
+                    <select class="form-select" id="filterPlatform">
+                        <option value="">All Platforms</option>
+                        <option value="Noon">Noon</option>
+                        <option value="Careem">Careem</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label for="filterStatus" class="form-label">Filter by Status</label>
+                    <select class="form-select" id="filterStatus">
+                        <option value="">All Statuses</option>
+                        <option value="Open">Open</option>
+                        <option value="Sent">Sent</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="filterDateFrom" class="form-label">Date From</label>
+                    <input type="date" class="form-control" id="filterDateFrom">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="filterDateTo" class="form-label">Date To</label>
+                    <input type="date" class="form-control" id="filterDateTo">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="filterOrderDate" class="form-label">Order Date</label>
+                    <input type="date" class="form-control" id="filterOrderDate">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <button class="btn btn-crispy" onclick="applyFilters()">
+                        <i class="bi bi-funnel"></i> Apply Filters
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="resetFilters()">
+                        <i class="bi bi-x-circle"></i> Reset Filters
+                    </button>
+                    <button class="btn btn-outline-primary" onclick="exportToCSV()">
+                        <i class="bi bi-download"></i> Export to CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Add New Ticket Button -->
+        <div class="text-center mb-5">
+            <button class="btn btn-crispy btn-lg pulse" onclick="openForm()">
+                <i class="bi bi-plus-circle"></i> Add New Ticket
+            </button>
+        </div>
+        <!-- Tickets Table -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-list-task"></i> Complaint Tickets</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="ticketsTable">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Order Date</th>
+                                <th>Branch</th>
+                                <th>Platform</th>
+                                <th>Issue</th>
+                                <th>Evidence</th>
+                                <th>Status</th>
+                                <th>Compensation</th>
+                                <th>Date Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <i class="bi bi-inbox"></i>
+                    <h5>No tickets found</h5>
+                    <p>Add your first complaint ticket using the button above</p>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="bg-white p-4 rounded-lg shadow">
-      <h2 class="text-lg font-semibold mb-2">Issues Breakdown</h2>
-      <canvas id="pieChart"></canvas>
+    
+    <!-- Form Overlay -->
+    <div class="form-overlay" id="formOverlay" onclick="closeForm()"></div>
+    
+    <!-- Add Ticket Form -->
+    <div class="form-popup" id="orderForm">
+        <h3><i class="bi bi-plus-circle"></i> Add New Ticket</h3>
+        <label>Order ID</label>
+        <input type="text" id="orderId" required>
+        
+        <label>Order Date</label>
+        <input type="date" id="orderDate" required>
+        
+        <label>Branch</label>
+        <select id="branch" required>
+            <option value="">Select Branch</option>
+            <option value="Crispy Chicken Khalidiya">Crispy Chicken Khalidiya</option>
+            <option value="Crispy Chicken Muroor">Crispy Chicken Muroor</option>
+            <option value="Crispy Chicken Shabiya 11">Crispy Chicken Shabiya 11</option>
+            <option value="Crispy Chicken Al Barsha">Crispy Chicken Al Barsha</option>
+            <option value="Crispy Chicken Al Satwa">Crispy Chicken Al Satwa</option>
+            <option value="Crispy Chicken Electra">Crispy Chicken Electra</option>
+            <option value="Crispy Chicken Hamdan">Crispy Chicken Hamdan</option>
+        </select>
+        
+        <label>Platform</label>
+        <select id="platform" required>
+            <option value="">Select Platform</option>
+            <option value="Noon">Noon</option>
+            <option value="Careem">Careem</option>
+        </select>
+        
+        <label>Issue Description</label>
+        <textarea id="issue" required></textarea>
+        
+        <label>Compensation Value (AED)</label>
+        <input type="number" id="compensation" placeholder="Enter compensation amount" min="0" step="0.01" required>
+        
+        <div class="evidence-section">
+            <h5><i class="bi bi-paperclip"></i> Evidence Upload</h5>
+            <p class="text-muted mb-3">Upload photos, videos, or other evidence files to support your claim</p>
+            
+            <div class="file-drop-area" id="fileDropArea">
+                <i class="bi bi-cloud-upload fs-1 text-muted"></i>
+                <p class="mb-2">Drag & drop files here or click to browse</p>
+                <small class="text-muted">Supported formats: JPG, PNG, PDF, MP4 (Max 10MB)</small>
+                <input type="file" class="file-input" id="fileInput" multiple accept=".jpg,.jpeg,.png,.pdf,.mp4">
+            </div>
+            
+            <div class="file-list" id="fileList"></div>
+            
+            <div class="mt-3">
+                <label class="form-label">Or provide a link to evidence:</label>
+                <input type="url" class="form-control" id="evidenceLink" placeholder="https://example.com/evidence.jpg">
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="noEvidence">
+                    <label class="form-check-label" for="noEvidence">
+                        No evidence available
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-flex gap-3 mt-4">
+            <button class="btn btn-crispy" onclick="saveTicket()">
+                <i class="bi bi-check-circle"></i> Save Ticket
+            </button>
+            <button class="btn btn-outline-secondary" onclick="closeForm()">
+                <i class="bi bi-x-circle"></i> Cancel
+            </button>
+        </div>
     </div>
-  </div>
-
-  <!-- Floating Dock -->
-  <div id="dock" class="dock">
-    <button id="dockToggle" class="bg-gray-800 text-white px-4 py-2 rounded-full shadow">⚙️</button>
-    <div id="dockButtons" class="dock-buttons">
-      <button id="newTicketBtn" class="bg-red-500 text-white px-4 py-2 rounded shadow">➕ New Ticket</button>
-      <button id="sampleBtn" class="bg-red-400 text-white px-4 py-2 rounded shadow">📌 Add Sample</button>
-      <button id="resetBtn" class="bg-gray-400 text-white px-4 py-2 rounded shadow">🔄 Reset</button>
-      <button id="printBtn" class="bg-blue-500 text-white px-4 py-2 rounded shadow">🖨️ Print</button>
-      <button id="dashboardBtn" class="bg-green-500 text-white px-4 py-2 rounded shadow">📊 Dashboard</button>
-      <button id="heatmapBtn" class="bg-yellow-500 text-white px-4 py-2 rounded shadow">🔥 Heatmap</button>
-      <button id="exportBtn" class="bg-indigo-500 text-white px-4 py-2 rounded shadow">📂 Export</button>
+    
+    <!-- Edit Ticket Form -->
+    <div class="form-popup" id="editTicketForm">
+        <h3><i class="bi bi-pencil"></i> Edit Ticket</h3>
+        <input type="hidden" id="editTicketId">
+        
+        <label>Order ID</label>
+        <input type="text" id="editOrderId" required>
+        
+        <label>Order Date</label>
+        <input type="date" id="editOrderDate" required>
+        
+        <label>Branch</label>
+        <select id="editBranch" required>
+            <option value="">Select Branch</option>
+            <option value="Crispy Chicken Khalidiya">Crispy Chicken Khalidiya</option>
+            <option value="Crispy Chicken Muroor">Crispy Chicken Muroor</option>
+            <option value="Crispy Chicken Shabiya 11">Crispy Chicken Shabiya 11</option>
+            <option value="Crispy Chicken Al Barsha">Crispy Chicken Al Barsha</option>
+            <option value="Crispy Chicken Al Satwa">Crispy Chicken Al Satwa</option>
+            <option value="Crispy Chicken Electra">Crispy Chicken Electra</option>
+            <option value="Crispy Chicken Hamdan">Crispy Chicken Hamdan</option>
+        </select>
+        
+        <label>Platform</label>
+        <select id="editPlatform" required>
+            <option value="">Select Platform</option>
+            <option value="Noon">Noon</option>
+            <option value="Careem">Careem</option>
+        </select>
+        
+        <label>Issue Description</label>
+        <textarea id="editIssue" required></textarea>
+        
+        <label>Compensation Value (AED)</label>
+        <input type="number" id="editCompensation" placeholder="Enter compensation amount" min="0" step="0.01" required>
+        
+        <div class="evidence-section">
+            <h5><i class="bi bi-paperclip"></i> Evidence</h5>
+            <label class="form-label">Evidence (link or description):</label>
+            <input type="text" class="form-control" id="editEvidence">
+            <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" id="editNoEvidence">
+                <label class="form-check-label" for="editNoEvidence">
+                    No evidence available
+                </label>
+            </div>
+        </div>
+        
+        <div class="d-flex gap-3 mt-4">
+            <button class="btn btn-crispy" onclick="saveEditedTicket()">
+                <i class="bi bi-check-circle"></i> Save Changes
+            </button>
+            <button class="btn btn-outline-secondary" onclick="closeEditForm()">
+                <i class="bi bi-x-circle"></i> Cancel
+            </button>
+        </div>
     </div>
-  </div>
-
-  <!-- Heatmap -->
-  <div id="heatmapContainer"></div>
-
-  <script>
-    // Load data
-    let tickets = JSON.parse(localStorage.getItem("tickets") || "[]");
-
-    const tbody = document.getElementById("ticketsBody");
-    const heatmapContainer = document.getElementById("heatmapContainer");
-    const heatmap = h337.create({ container: heatmapContainer });
-
-    // Render tickets
-    function renderTickets() {
-      tbody.innerHTML = "";
-      tickets.forEach(t => {
-        const row = document.createElement("tr");
-        row.className = "border-b";
-        row.innerHTML = `
-          <td class="font-bold px-3 py-2">${t.id}</td>
-          <td class="px-3 py-2">${t.date}</td>
-          <td class="px-3 py-2">${t.branch}</td>
-          <td class="px-3 py-2">${t.platform}</td>
-          <td class="px-3 py-2">${t.issue}</td>
-        `;
-        tbody.appendChild(row);
-      });
-      localStorage.setItem("tickets", JSON.stringify(tickets));
-      updateCharts();
-    }
-
-    // Charts
-    let barChart, pieChart;
-    function updateCharts() {
-      const branchCount = {};
-      const issueCount = {};
-
-      tickets.forEach(t => {
-        branchCount[t.branch] = (branchCount[t.branch] || 0) + 1;
-        issueCount[t.issue] = (issueCount[t.issue] || 0) + 1;
-      });
-
-      // Bar Chart
-      if (barChart) barChart.destroy();
-      barChart = new Chart(document.getElementById("barChart"), {
-        type: "bar",
-        data: {
-          labels: Object.keys(branchCount),
-          datasets: [{ label: "Complaints", data: Object.values(branchCount), backgroundColor: "rgba(239,68,68,0.7)" }]
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2023 Crispy Chicken Delivery Management System. All rights reserved.</p>
+        </div>
+    </footer>
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <i class="bi bi-check-circle-fill"></i>
+        <span id="notificationText">Action completed successfully!</span>
+    </div>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let tickets = JSON.parse(localStorage.getItem('crispyTickets')) || [];
+        let filteredTickets = [...tickets];
+        let uploadedFiles = [];
+        
+        // WhatsApp branch numbers
+        const branchNumbers = {
+            "Crispy Chicken Khalidiya": "971569494764",
+            "Crispy Chicken Muroor": "971505414641",
+            "Crispy Chicken Shabiya 11": "971562690688",
+            "Crispy Chicken Al Barsha": "971569659524",
+            "Crispy Chicken Al Satwa": "971567970685",
+            "Crispy Chicken Electra": "971563866859",
+            "Crispy Chicken Hamdan": "971556886650"
+        };
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing...');
+            
+            // Test function availability
+            console.log('Function availability:', {
+                openForm: typeof openForm,
+                closeForm: typeof closeForm,
+                saveTicket: typeof saveTicket
+            });
+            
+            renderTickets();
+            updateStats();
+            updatePlatformStats();
+            initFileUpload();
+            
+            // Set today's date as default for order date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('orderDate').value = today;
+            
+            // Search functionality
+            document.getElementById('searchOrder').addEventListener('input', function() {
+                applyFilters();
+            });
+            
+            // Filter change events
+            document.getElementById('filterBranch').addEventListener('change', applyFilters);
+            document.getElementById('filterPlatform').addEventListener('change', applyFilters);
+            document.getElementById('filterStatus').addEventListener('change', applyFilters);
+            document.getElementById('filterDateFrom').addEventListener('change', applyFilters);
+            document.getElementById('filterDateTo').addEventListener('change', applyFilters);
+            document.getElementById('filterOrderDate').addEventListener('change', applyFilters);
+            
+            // Test button
+            const testButton = document.createElement('button');
+            testButton.className = 'btn btn-info mt-3';
+            testButton.innerHTML = '<i class="bi bi-bug"></i> Test Functions';
+            testButton.onclick = testFunctions;
+            document.querySelector('.container').appendChild(testButton);
+        });
+        
+        // Test functions
+        function testFunctions() {
+            console.log('Testing functions...');
+            alert('Testing functions...\n\n' +
+                  'openForm: ' + (typeof openForm) + '\n' +
+                  'closeForm: ' + (typeof closeForm) + '\n' +
+                  'saveTicket: ' + (typeof saveTicket) + '\n\n' +
+                  'Tickets count: ' + tickets.length + '\n' +
+                  'Branch numbers count: ' + Object.keys(branchNumbers).length);
+            
+            // Test form visibility
+            openForm();
         }
-      });
-
-      // Pie Chart
-      if (pieChart) pieChart.destroy();
-      pieChart = new Chart(document.getElementById("pieChart"), {
-        type: "pie",
-        data: {
-          labels: Object.keys(issueCount),
-          datasets: [{ data: Object.values(issueCount), backgroundColor: ["#ef4444","#3b82f6","#10b981","#f59e0b","#8b5cf6","#6b7280"] }]
-        }
-      });
-    }
-
-    // Buttons
-    document.getElementById("dockToggle").onclick = () => {
-      document.getElementById("dockButtons").classList.toggle("show");
-    };
-
-    document.getElementById("newTicketBtn").onclick = () => {
-      const id = prompt("Order ID:");
-      const date = prompt("Order Date (YYYY-MM-DD):");
-      const branch = prompt("Branch:");
-      const platform = prompt("Platform:");
-      const issue = prompt("Issue:");
-      if (id && date && branch && platform && issue) {
-        tickets.push({ id, date, branch, platform, issue });
-        renderTickets();
-      }
-    };
-
-    document.getElementById("sampleBtn").onclick = () => {
-      tickets.push({ id: "SMP" + Math.floor(Math.random()*1000), date: "2025-09-02", branch: "Crispy Chicken Muroor", platform: "Noon", issue: "Missing Item" });
-      renderTickets();
-    };
-
-    document.getElementById("resetBtn").onclick = () => {
-      if (confirm("Clear all tickets?")) {
-        tickets = [];
-        renderTickets();
-      }
-    };
-
-    document.getElementById("printBtn").onclick = () => window.print();
-
-    document.getElementById("dashboardBtn").onclick = () => {
-      document.getElementById("dashboard").scrollIntoView({ behavior: "smooth" });
-    };
-
-    document.getElementById("heatmapBtn").onclick = () => {
-      heatmapContainer.style.display = heatmapContainer.style.display === "none" ? "block" : "none";
-      if (heatmapContainer.style.display === "block") {
-        const points = [];
-        for (let i = 0; i < 200; i++) {
-          points.push({ x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight, value: 1 });
-        }
-        heatmap.setData({ max: 5, data: points });
-      }
-    };
-
-    document.getElementById("exportBtn").onclick = () => {
-      let csv = "Order ID,Date,Branch,Platform,Issue\n";
-      tickets.forEach(t => {
-        csv += `${t.id},${t.date},${t.branch},${t.platform},${t.issue}\n`;
-      });
-      const blob = new Blob([csv], { type: "text/csv" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "tickets.csv";
-      link.click();
-    };
-
-    // Draggable Dock
-    const dock = document.getElementById("dock");
-    let isDragging = false, offsetX, offsetY;
-    dock.addEventListener("mousedown", e => {
-      if (e.target.id === "dockToggle") return;
-      isDragging = true;
-      offsetX = e.clientX - dock.getBoundingClientRect().left;
-      offsetY = e.clientY - dock.getBoundingClientRect().top;
-    });
-    document.addEventListener("mousemove", e => {
-      if (!isDragging) return;
-      dock.style.left = `${e.clientX - offsetX}px`;
-      dock.style.top = `${e.clientY - offsetY}px`;
-      dock.style.bottom = "auto";
-      dock.style.right = "auto";
-    });
-    document.addEventListener("mouseup", () => isDragging = false);
-
-    // Init
-    renderTickets();
-  </script>
-</body>
-</html>
+        
+        // Open form
+        function openForm() {
+            console.log('Opening form...');
+            const form = document.getElementById('orderForm');
+            const overlay = document.getElementById('formOverlay');
+            
+            // Reset form
+            resetForm();
+            
+            // Show form and overlay
+            form.style.display = 'block';
+            overlay.classList.add('show');
+            
+            // Set today's date
+            const today = new Date().toISOString().split('T')[0
