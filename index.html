@@ -214,13 +214,16 @@
     
     .commands-container {
       position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
     }
     
-    /* Fixed Commands Window */
+    /* Fixed Commands Window (Right Side) */
     .commands-window {
       position: fixed;
-      bottom: 24px;
       right: 24px;
+      bottom: 24px;
       width: 320px;
       background: linear-gradient(135deg, rgba(211,47,47,0.95), rgba(183,28,28,0.95));
       color: white;
@@ -278,7 +281,8 @@
     
     /* All Commands Container */
     .all-commands-container {
-      margin-top: 180px; /* Space for fixed window */
+      margin-top: 180px;
+      margin-right: 340px; /* Space for fixed window */
     }
     
     .all-commands-container h6 {
@@ -375,7 +379,10 @@
       .chart-row{grid-template-columns:1fr;}
       .refund-grid{grid-template-columns:1fr;}
       .compensation-analysis-grid{grid-template-columns:1fr;}
-      .all-commands-container { margin-top: 160px; }
+      .all-commands-container { 
+        margin-top: 160px;
+        margin-right: 0;
+      }
     }
     @media (max-width: 768px){
       .stats-grid{grid-template-columns:1fr;}
@@ -394,6 +401,10 @@
         right: 16px;
         bottom: 16px;
       }
+      .all-commands-container { 
+        margin-top: 140px;
+        margin-right: 0;
+      }
     }
     @media (max-width: 576px){
       .container-page{padding:0 12px;}
@@ -403,7 +414,10 @@
       .report-card{padding:16px;}
       .tickets-table th,.tickets-table td{padding:10px 8px;}
       .ticket-issue{max-width:150px;}
-      .all-commands-container { margin-top: 140px; }
+      .all-commands-container { 
+        margin-top: 120px;
+        margin-right: 0;
+      }
     }
   </style>
 </head>
@@ -910,6 +924,9 @@
       <button class="btn btn-outline-secondary" onclick="exportUsabilityLog()" title="Export user interactions">
         <i class="bi bi-box-arrow-up-right me-1"></i> Export Log
       </button>
+      <button class="btn btn-outline-info" onclick="clearCommands()" title="Clear commands">
+        <i class="bi bi-trash me-1"></i> Clear Commands
+      </button>
     </div>
     <button id="dockToggle" class="dock-toggle" title="Open actions">
       <i class="bi bi-gear-fill"></i>
@@ -968,8 +985,22 @@
   // Init setup
   document.addEventListener('DOMContentLoaded', () => {
     populateBranchFilters();
-    if (tickets.length === 0) addSample(); // seed
-    renderAll();
+    
+    // تحميل البيانات من localStorage
+    const storedTickets = localStorage.getItem('crispyTickets');
+    if (storedTickets) {
+      tickets = JSON.parse(storedTickets);
+      console.log('Loaded tickets:', tickets.length);
+    }
+    
+    // إذا لم تكن هناك بيانات، أضف عينات
+    if (tickets.length === 0) {
+      addSample();
+    } else {
+      // إذا كانت هناك بيانات، قم بتحديث الواجهة
+      renderAll();
+    }
+    
     setupListeners();
     initHeatmap();
     updateSummaryDate();
@@ -1046,6 +1077,7 @@
   // ===== Utility =====
   function save() {
     localStorage.setItem('crispyTickets', JSON.stringify(tickets));
+    console.log('Saved tickets:', tickets.length);
   }
   
   function showNotif(msg, type = 'success') {
@@ -2126,45 +2158,62 @@
   }
   
   function addSample() {
-    const sample = [
-      { 
-        id: Date.now().toString() + 'a', 
-        orderId: 'CR' + Math.floor(Math.random() * 900000 + 100000), 
-        orderDate: new Date().toISOString(), 
-        branch: 'Crispy Chicken Khalidiya', 
-        platform: 'Careem', 
-        issue: 'Food was cold and delivery was late', 
-        originalAmount: 85.00,
-        compensation: 25.00, 
-        refundedAmount: 10.00,
-        isRefunded: true,
-        refundDate: new Date().toISOString().split('T')[0],
-        evidence: 'None', 
-        status: 'Open' 
-      },
-      { 
-        id: Date.now().toString() + 'b', 
-        orderId: 'ORD' + Math.floor(Math.random() * 900000 + 100000), 
-        orderDate: new Date().toISOString(), 
-        branch: 'Crispy Chicken Muroor', 
-        platform: 'Noon', 
-        issue: 'Wrong order items received', 
-        originalAmount: 120.00,
-        compensation: 45.00, 
-        refundedAmount: 0,
-        isRefunded: false,
-        evidence: 'None', 
-        status: 'Open' 
-      }
-    ];
-    
-    tickets = sample.concat(tickets); 
-    save(); 
-    renderAll(); 
-    showNotif('Sample cases added', 'success');
-    
-    // Track command
-    addCommand('Add Sample Cases', `Added ${sample.length} sample cases`);
+    try {
+      const sample = [
+        { 
+          id: Date.now().toString() + 'a', 
+          orderId: 'CR' + Math.floor(Math.random() * 900000 + 100000), 
+          orderDate: new Date().toISOString(), 
+          branch: 'Crispy Chicken Khalidiya', 
+          platform: 'Careem', 
+          issue: 'Food was cold and delivery was late', 
+          originalAmount: 85.00,
+          compensation: 25.00, 
+          refundedAmount: 10.00,
+          isRefunded: true,
+          refundDate: new Date().toISOString().split('T')[0],
+          evidence: 'None', 
+          status: 'Open' 
+        },
+        { 
+          id: Date.now().toString() + 'b', 
+          orderId: 'ORD' + Math.floor(Math.random() * 900000 + 100000), 
+          orderDate: new Date().toISOString(), 
+          branch: 'Crispy Chicken Muroor', 
+          platform: 'Noon', 
+          issue: 'Wrong order items received', 
+          originalAmount: 120.00,
+          compensation: 45.00, 
+          refundedAmount: 0,
+          isRefunded: false,
+          evidence: 'None', 
+          status: 'Open' 
+        }
+      ];
+      
+      // إضافة الحالات الجديدة بشكل صريح
+      sample.forEach(newTicket => {
+        tickets.unshift(newTicket);
+      });
+      
+      console.log('After adding sample:', tickets.length);
+      
+      // حفظ البيانات
+      localStorage.setItem('crispyTickets', JSON.stringify(tickets));
+      
+      // تحديث الواجهة
+      renderAll();
+      
+      // إظهار الإشعار
+      showNotif('Sample cases added successfully', 'success');
+      
+      // Track command
+      addCommand('Add Sample Cases', `Added ${sample.length} sample cases`);
+      
+    } catch (error) {
+      console.error('Error in addSample:', error);
+      showNotif('Error adding sample cases', 'error');
+    }
   }
   
   function resetAll() {
