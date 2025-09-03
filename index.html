@@ -202,9 +202,163 @@
     .daily-stat-value{font-weight:700;font-size:1.1rem;}
     .daily-stat-label{font-size:0.85rem;color:var(--text-secondary);}
     
+    /* Commands Section Styles */
+    .commands-section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+    
+    .commands-container {
+      position: relative;
+    }
+    
+    /* Fixed Commands Window */
+    .commands-window {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 320px;
+      background: linear-gradient(135deg, rgba(211,47,47,0.95), rgba(183,28,28,0.95));
+      color: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 26px rgba(0,0,0,0.3);
+      z-index: 1500;
+      transition: all 0.3s ease;
+      max-height: 180px;
+      overflow: hidden;
+    }
+    
+    .commands-window:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    }
+    
+    .commands-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .commands-header h6 {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    
+    .commands-list {
+      padding: 10px;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    
+    .commands-list .command-item {
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+    
+    .commands-list .command-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .commands-list .command-time {
+      font-size: 0.75rem;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+    
+    /* All Commands Container */
+    .all-commands-container {
+      margin-top: 180px; /* Space for fixed window */
+    }
+    
+    .all-commands-container h6 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--crispy-dark);
+    }
+    
+    .all-commands-list {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid rgba(0,0,0,0.05);
+      border-radius: 8px;
+      padding: 12px;
+      background: #f8f9fa;
+    }
+    
+    .all-commands-list .command-item {
+      padding: 12px;
+      margin-bottom: 12px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      border-left: 3px solid var(--crispy-red);
+    }
+    
+    .all-commands-list .command-item:last-child {
+      margin-bottom: 0;
+    }
+    
+    .all-commands-list .command-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .all-commands-list .command-title {
+      font-weight: 600;
+      color: var(--crispy-dark);
+    }
+    
+    .all-commands-list .command-time {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    
+    .all-commands-list .command-details {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+    
+    /* Scrollbar styling */
+    .commands-list::-webkit-scrollbar,
+    .all-commands-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .commands-list::-webkit-scrollbar-track,
+    .all-commands-list::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+    }
+    
+    .commands-list::-webkit-scrollbar-thumb,
+    .all-commands-list::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.3);
+      border-radius: 3px;
+    }
+    
+    .commands-list::-webkit-scrollbar-thumb:hover,
+    .all-commands-list::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.5);
+    }
+    
     /* Print styles */
     @media print{
-      #dock, .tickets-header .btn, .action-buttons, .navbar, .modal, .notification { display:none !important; }
+      #dock, .tickets-header .btn, .action-buttons, .navbar, .modal, .notification, .commands-window { display:none !important; }
       body{background:#fff}
       .card-ghost{box-shadow:none;border:1px solid #ddd;}
     }
@@ -221,6 +375,7 @@
       .chart-row{grid-template-columns:1fr;}
       .refund-grid{grid-template-columns:1fr;}
       .compensation-analysis-grid{grid-template-columns:1fr;}
+      .all-commands-container { margin-top: 160px; }
     }
     @media (max-width: 768px){
       .stats-grid{grid-template-columns:1fr;}
@@ -234,6 +389,11 @@
       #dock{right:16px;bottom:16px;}
       .dock-panel{width:180px;}
       .dock-panel button{min-width:160px;font-size:0.9rem;}
+      .commands-window {
+        width: 280px;
+        right: 16px;
+        bottom: 16px;
+      }
     }
     @media (max-width: 576px){
       .container-page{padding:0 12px;}
@@ -243,6 +403,7 @@
       .report-card{padding:16px;}
       .tickets-table th,.tickets-table td{padding:10px 8px;}
       .ticket-issue{max-width:150px;}
+      .all-commands-container { margin-top: 140px; }
     }
   </style>
 </head>
@@ -551,6 +712,32 @@
       </div>
       <div id="ticketsContainer"></div>
     </section>
+    
+    <!-- Commands Section -->
+    <section class="commands-section">
+      <div class="commands-container">
+        <!-- Fixed Commands Window (Last 3 commands) -->
+        <div id="commandsWindow" class="commands-window">
+          <div class="commands-header">
+            <h6><i class="bi bi-terminal me-1"></i> Last Commands</h6>
+            <button class="btn btn-sm btn-outline-light" onclick="clearCommands()">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+          <div id="commandsList" class="commands-list">
+            <!-- Last 3 commands will be shown here -->
+          </div>
+        </div>
+        
+        <!-- Scrollable All Commands -->
+        <div class="all-commands-container">
+          <h6><i class="bi bi-list-ul me-1"></i> All Commands</h6>
+          <div id="allCommandsList" class="all-commands-list">
+            <!-- All commands will be shown here -->
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
   
   <!-- Enhanced Modal -->
@@ -774,6 +961,10 @@
   let heatmapVisible = false;
   const interactions = [];
   
+  // Commands tracking
+  let commands = [];
+  const MAX_COMMANDS_VISIBLE = 3;
+  
   // Init setup
   document.addEventListener('DOMContentLoaded', () => {
     populateBranchFilters();
@@ -782,7 +973,63 @@
     setupListeners();
     initHeatmap();
     updateSummaryDate();
+    
+    // Initialize commands display
+    updateCommandsDisplay();
   });
+  
+  // ===== Commands tracking functions =====
+  function addCommand(title, details = '') {
+    const now = new Date();
+    const command = {
+      id: Date.now(),
+      title,
+      details,
+      time: now.toLocaleTimeString()
+    };
+    
+    commands.unshift(command);
+    
+    // Keep only last 50 commands to prevent memory issues
+    if (commands.length > 50) {
+      commands = commands.slice(0, 50);
+    }
+    
+    updateCommandsDisplay();
+  }
+  
+  function updateCommandsDisplay() {
+    // Update fixed window (last 3 commands)
+    const commandsList = document.getElementById('commandsList');
+    const lastCommands = commands.slice(0, MAX_COMMANDS_VISIBLE);
+    
+    commandsList.innerHTML = lastCommands.map(cmd => `
+      <div class="command-item">
+        <div>${cmd.title}</div>
+        <div class="command-time">${cmd.time}</div>
+      </div>
+    `).join('');
+    
+    // Update all commands list
+    const allCommandsList = document.getElementById('allCommandsList');
+    allCommandsList.innerHTML = commands.map(cmd => `
+      <div class="command-item">
+        <div class="command-header">
+          <div class="command-title">${cmd.title}</div>
+          <div class="command-time">${cmd.time}</div>
+        </div>
+        ${cmd.details ? `<div class="command-details">${cmd.details}</div>` : ''}
+      </div>
+    `).join('');
+  }
+  
+  function clearCommands() {
+    if (confirm('Clear all command history?')) {
+      commands = [];
+      updateCommandsDisplay();
+      showNotif('Command history cleared', 'success');
+    }
+  }
   
   // ===== Populate branch selects =====
   function populateBranchFilters() {
@@ -1771,6 +2018,9 @@
     const nowLocal = new Date().toISOString().slice(0, 16);
     document.getElementById('f_orderDate').value = nowLocal;
     new bootstrap.Modal(document.getElementById('ticketModal')).show();
+    
+    // Track command
+    addCommand('Open Add Modal');
   }
   
   document.getElementById('ticketForm').addEventListener('submit', function(e) {
@@ -1801,11 +2051,15 @@
       if (idx > -1) { 
         tickets[idx] = { ...tickets[idx], ...payload }; 
         showNotif('Case updated', 'success'); 
+        // Track command
+        addCommand('Update Ticket', `Updated Order ${payload.orderId}`);
       }
     } else {
       const newTicket = { id: Date.now().toString(), ...payload };
       tickets.unshift(newTicket); 
       showNotif('Case added', 'success');
+      // Track command
+      addCommand('Add Ticket', `Added Order ${payload.orderId}`);
     }
     
     save(); 
@@ -1854,6 +2108,9 @@
     
     autogrow(document.getElementById('f_issue'));
     new bootstrap.Modal(document.getElementById('ticketModal')).show();
+    
+    // Track command
+    addCommand('Edit Ticket', `Editing Order ${t.orderId}`);
   }
   
   function closeTicket(id) {
@@ -1863,6 +2120,9 @@
     save(); 
     renderAll(); 
     showNotif('Case closed', 'success');
+    
+    // Track command
+    addCommand('Close Ticket', `Order ${t.orderId} marked as Closed`);
   }
   
   function addSample() {
@@ -1897,10 +2157,14 @@
         status: 'Open' 
       }
     ];
+    
     tickets = sample.concat(tickets); 
     save(); 
     renderAll(); 
     showNotif('Sample cases added', 'success');
+    
+    // Track command
+    addCommand('Add Sample Cases', `Added ${sample.length} sample cases`);
   }
   
   function resetAll() {
@@ -1909,6 +2173,9 @@
     tickets = [];
     renderAll();
     showNotif('Data reset', 'success');
+    
+    // Track command
+    addCommand('Reset All Data');
   }
   
   // ===== Enhanced Communications with dispute templates =====
@@ -1971,6 +2238,9 @@ ${t.branch}`;
     save();
     renderAll();
     showNotif('Email client opened', 'success');
+    
+    // Track command
+    addCommand('Send Email', `Email sent for Order ${t.orderId} (${t.platform})`);
   }
   
   function sendWhatsApp(id) {
@@ -2013,6 +2283,9 @@ ${t.branch}`;
     save();
     renderAll();
     showNotif('WhatsApp opened', 'success');
+    
+    // Track command
+    addCommand('Send WhatsApp', `WhatsApp message sent for Order ${t.orderId}`);
   }
   
   // ===== Other actions =====
@@ -2021,6 +2294,9 @@ ${t.branch}`;
     if (!t) return;
     const txt = `Order ID: ${t.orderId}\nDate: ${formatDateISO(t.orderDate)}\nBranch: ${t.branch}\nPlatform: ${t.platform}\nCase: ${t.issue}\nOriginal Amount: AED ${Number(t.originalAmount || 0).toFixed(2)}\nCompensation: AED ${Number(t.compensation || 0).toFixed(2)}\nRefunded: AED ${Number(t.refundedAmount || 0).toFixed(2)}`;
     navigator.clipboard.writeText(txt).then(() => showNotif('Copied to clipboard', 'success'), () => showNotif('Copy failed', 'error'));
+    
+    // Track command
+    addCommand('Copy Ticket', `Copied details for Order ${t.orderId}`);
   }
   
   // ===== Issue modal =====
@@ -2029,6 +2305,9 @@ ${t.branch}`;
     if (!t) return;
     document.getElementById('issueText').textContent = t.issue;
     new bootstrap.Modal(document.getElementById('issueModal')).show();
+    
+    // Track command
+    addCommand('View Issue', `Viewing issue details for Order ${t.orderId}`);
   }
   
   // ===== Dock logic =====
@@ -2161,6 +2440,9 @@ ${t.branch}`;
     const ws = XLSX.utils.json_to_sheet(data);
     XLSX.utils.book_append_sheet(wb, ws, "Cases");
     XLSX.writeFile(wb, `compensation_cases_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    
+    // Track command
+    addCommand('Export Excel', `Exported ${tickets.length} cases to Excel`);
   }
   
   async function exportPDF() {
@@ -2180,6 +2462,9 @@ ${t.branch}`;
       const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
       pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
       pdf.save(`cases_${new Date().toISOString().slice(0, 10)}.pdf`);
+      
+      // Track command
+      addCommand('Export PDF', `Exported cases to PDF`);
     } catch (err) { 
       console.error(err); 
       showNotif('PDF export failed', 'error'); 
@@ -2261,6 +2546,9 @@ ${t.branch}`;
       pdf.addImage(img6, 'PNG', 10, 10, img6W, img6H);
       
       pdf.save(`dashboard_summary_${new Date().toISOString().slice(0, 10)}.pdf`);
+      
+      // Track command
+      addCommand('Export Dashboard PDF', `Exported dashboard summary to PDF`);
     } catch (err) { 
       console.error(err); 
       showNotif('Dashboard PDF export failed', 'error'); 
@@ -2286,6 +2574,9 @@ ${t.branch}`;
     heatmapVisible = !heatmapVisible;
     heatmapContainer.style.display = heatmapVisible ? 'block' : 'none';
     document.getElementById('heatmapToggleBtn').classList.toggle('active', heatmapVisible);
+    
+    // Track command
+    addCommand('Toggle Heatmap', `Heatmap ${heatmapVisible ? 'enabled' : 'disabled'}`);
   }
   
   function recordInteraction(e) {
@@ -2319,6 +2610,9 @@ ${t.branch}`;
     a.click(); 
     URL.revokeObjectURL(url);
     showNotif('Usability log exported', 'success');
+    
+    // Track command
+    addCommand('Export Usability Log', 'Exported user interaction log');
   }
   
   // ===== Setup listeners =====
