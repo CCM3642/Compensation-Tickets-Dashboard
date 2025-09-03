@@ -75,6 +75,18 @@
     .case-reason-bar{width:100%;height:8px;background:#e9ecef;border-radius:4px;margin-top:6px;overflow:hidden;}
     .case-reason-progress{height:100%;background:var(--crispy-red);border-radius:4px;}
     
+    /* Compensation Analysis Section */
+    .compensation-analysis-section{background:var(--card-bg);border-radius:16px;padding:30px;margin-bottom:30px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.05);}
+    .compensation-analysis-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;}
+    .compensation-analysis-header h5{font-size:1.4rem;font-weight:700;margin:0;color:var(--text-primary);}
+    .compensation-analysis-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;}
+    .compensation-card{background:#f8f9fa;border-radius:12px;padding:20px;border:1px solid rgba(0,0,0,0.05);}
+    .compensation-card h6{font-size:1.1rem;font-weight:700;margin-bottom:15px;color:var(--crispy-dark);}
+    .compensation-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+    .stat-item{text-align:center;padding:16px;background:var(--card-bg);border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.05);}
+    .stat-value{font-size:1.3rem;font-weight:700;color:var(--crispy-red);margin-bottom:4px;}
+    .stat-label{font-size:0.85rem;color:var(--text-secondary);font-weight:500;}
+    
     /* Refund Analysis Section */
     .refund-analysis-section{background:var(--card-bg);border-radius:16px;padding:30px;margin-bottom:30px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.05);}
     .refund-analysis-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;}
@@ -208,6 +220,7 @@
       .summary-grid{grid-template-columns:1fr;}
       .chart-row{grid-template-columns:1fr;}
       .refund-grid{grid-template-columns:1fr;}
+      .compensation-analysis-grid{grid-template-columns:1fr;}
     }
     @media (max-width: 768px){
       .stats-grid{grid-template-columns:1fr;}
@@ -267,6 +280,18 @@
       <div class="stat-card text-center" style="border-left-color:#198754;">
         <div class="text-muted">Closed</div>
         <h2 id="closedTickets" style="color:#198754;">0</h2>
+      </div>
+      <div class="stat-card text-center" style="border-left-color:#28a745;">
+        <div class="text-muted">Resolved Disputes</div>
+        <h2 id="resolvedDisputes" style="color:#28a745;">0</h2>
+      </div>
+      <div class="stat-card text-center" style="border-left-color:#17a2b8;">
+        <div class="text-muted">Active Compensations</div>
+        <h2 id="activeCompensations" style="color:#17a2b8;">0</h2>
+      </div>
+      <div class="stat-card text-center" style="border-left-color:#dc3545;">
+        <div class="text-muted">Total Compensation</div>
+        <h2 id="totalCompensationAmount" style="color:#dc3545;">0</h2>
       </div>
     </section>
     
@@ -427,6 +452,18 @@
         <div id="caseAnalysisBadge" class="case-badge badge-high">High Level</div>
       </div>
       <div id="branchAnalysisContainer"></div>
+    </section>
+    
+    <!-- Compensation Analysis Section -->
+    <section class="compensation-analysis-section">
+      <div class="compensation-analysis-header">
+        <h5>Compensation Analysis by Type</h5>
+        <div class="text-muted">
+          <i class="bi bi-bar-chart me-1"></i>
+          Breakdown of compensation cases
+        </div>
+      </div>
+      <div id="compensationAnalysisContainer"></div>
     </section>
     
     <!-- Refund Analysis Section -->
@@ -934,6 +971,7 @@
     updatePlatformStats();
     renderCharts();
     renderCaseAnalysis();
+    renderCompensationAnalysis();
     renderRefundAnalysis();
     renderSummary();
   }
@@ -1060,6 +1098,17 @@
     document.getElementById('openTickets').textContent = tickets.filter(t => t.status === 'Open').length;
     document.getElementById('sentTickets').textContent = tickets.filter(t => t.status === 'Sent').length;
     document.getElementById('closedTickets').textContent = tickets.filter(t => t.status === 'Closed').length;
+    
+    // إضافة مؤشر النزاعات المحلولة
+    document.getElementById('resolvedDisputes').textContent = tickets.filter(t => t.status === 'Closed').length;
+    
+    // إضافة مؤشر التعويضات النشطة
+    const activeCompensations = tickets.filter(t => t.status !== 'Closed' && t.compensation > 0);
+    document.getElementById('activeCompensations').textContent = activeCompensations.length;
+    
+    // إضافة مؤشر التعويضات المحصلة
+    const totalCompensation = tickets.reduce((sum, t) => sum + (t.compensation || 0), 0);
+    document.getElementById('totalCompensationAmount').textContent = 'AED ' + totalCompensation.toFixed(2);
   }
   
   function updatePlatformStats() {
@@ -1154,6 +1203,64 @@
         </tr>
       `;
     }
+  }
+  
+  // ===== Compensation Analysis =====
+  function analyzeCompensations() {
+    const compensationTypes = {
+      'Missing/Incorrect': 0,
+      'Spilled/Damaged': 0,
+      'Late Delivery': 0,
+      'Food Quality': 0,
+      'Other': 0
+    };
+    
+    const compensationAmounts = {
+      'Missing/Incorrect': 0,
+      'Spilled/Damaged': 0,
+      'Late Delivery': 0,
+      'Food Quality': 0,
+      'Other': 0
+    };
+    
+    tickets.forEach(ticket => {
+      if (ticket.compensation > 0) {
+        const type = classifyCase(ticket.issue);
+        compensationTypes[type] += 1;
+        compensationAmounts[type] += ticket.compensation;
+      }
+    });
+    
+    return { compensationTypes, compensationAmounts };
+  }
+  
+  function renderCompensationAnalysis() {
+    const analysis = analyzeCompensations();
+    
+    // إنشاء HTML لعرض التحليل
+    let html = '<div class="compensation-analysis-grid">';
+    
+    Object.keys(analysis.compensationTypes).forEach(type => {
+      html += `
+        <div class="compensation-card">
+          <h6>${type}</h6>
+          <div class="compensation-stats">
+            <div class="stat-item">
+              <div class="stat-value">${analysis.compensationTypes[type]}</div>
+              <div class="stat-label">Cases</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">AED ${analysis.compensationAmounts[type].toFixed(2)}</div>
+              <div class="stat-label">Total Amount</div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+    
+    html += '</div>';
+    
+    document.getElementById('compensationAnalysisContainer').innerHTML = html;
   }
   
   // ===== Summary Section =====
@@ -1612,15 +1719,45 @@
   
   function classifyCase(text = '') {
     const t = (text || '').toLowerCase();
+    
+    // تصنيف دقيق أكثر
     if (/cold|temperature|ice|frozen/.test(t)) return 'Cold Food';
     if (/late|delay|time/.test(t)) return 'Late Delivery';
-    if (/wrong|incorrect|different/.test(t)) return 'Wrong Items';
-    if (/missing|not included|lack/.test(t)) return 'Missing Items';
-    if (/quality|taste|bad|spoiled/.test(t)) return 'Food Quality';
+    if (/wrong|incorrect|different|missing/.test(t)) return 'Missing/Incorrect';
+    if (/spilled|damaged|broken/.test(t)) return 'Spilled/Damaged';
+    if (/quality|taste|bad|spoiled|raw/.test(t)) return 'Food Quality';
+    if (/rude|attitude|behavior|service/.test(t)) return 'Service Issue';
+    if (/app|website|technical|glitch/.test(t)) return 'Technical Issue';
     return 'Other';
   }
   
-  // ===== Actions: Add / Edit / Close / Sample / Reset =====
+  // ===== Enhanced dispute templates =====
+  function getTemplateType(ticket) {
+    const issue = (ticket.issue || '').toLowerCase();
+    
+    // إذا كان هناك دليل فيديو
+    if (ticket.evidence && ticket.evidence !== 'None' && ticket.evidence.startsWith('data:image')) {
+      return 'video_proof';
+    }
+    
+    // إذا كان النزاع عنصر مفقود أو غير صحيح
+    if (/missing|incorrect|different/.test(issue)) {
+      if (!ticket.evidence || ticket.evidence === 'None') {
+        return 'no_evidence';
+      }
+      return 'missing_incorrect';
+    }
+    
+    // إذا كان النزاع عن تلف أو تسرب بسبب سائق التوصيل
+    if (/spilled|damaged/.test(issue)) {
+      return 'driver_fault';
+    }
+    
+    // القالب الافتراضي
+    return 'default';
+  }
+  
+  // ===== Enhanced Actions: Add / Edit / Close / Sample / Reset =====
   function openAddModal() {
     document.getElementById('modalTitle').textContent = 'Add Compensation Case';
     document.getElementById('editingId').value = '';
@@ -1774,12 +1911,61 @@
     showNotif('Data reset', 'success');
   }
   
-  // ===== Communications =====
+  // ===== Enhanced Communications with dispute templates =====
   function sendEmail(id) {
     const t = tickets.find(x => x.id === id); 
     if (!t) return;
-    const subject = `Compensation Case — Order ${t.orderId}`;
-    const body = `Order ID: ${t.orderId}\nDate: ${formatDateISO(t.orderDate)}\nBranch: ${t.branch}\nPlatform: ${t.platform}\nCase: ${t.issue}\nOriginal Amount: AED ${Number(t.originalAmount || 0).toFixed(2)}\nCompensation: AED ${Number(t.compensation || 0).toFixed(2)}\nRefunded: AED ${Number(t.refundedAmount || 0).toFixed(2)}\nStatus: ${t.status}`;
+    
+    const templateType = getTemplateType(t);
+    const subject = `Dispute Rejection – Order ${t.orderId}`;
+    
+    let body = '';
+    
+    switch (templateType) {
+      case 'missing_incorrect':
+        body = `Subject: Dispute Rejection – Order ${t.orderId}
+Dear ${t.platform} Support Team,
+This is regarding Order ${t.orderId} from ${t.branch} on ${formatDateISO(t.orderDate)}, with a basket amount of AED ${Number(t.originalAmount || 0).toFixed(2)}.
+We have noted the deduction of AED ${Number(t.compensation || 0).toFixed(2)} for "${t.issue}". After reviewing our records and attached video evidence, the order was fully prepared and delivered as requested.
+We therefore reject this adjustment and request reversal.
+Best regards,
+${t.branch}`;
+        break;
+        
+      case 'driver_fault':
+        body = `Subject: Dispute Rejection – Order ${t.orderId}
+Dear ${t.platform} Support Team,
+This is regarding Order ${t.orderId} from ${t.branch} on ${formatDateISO(t.orderDate)}, with a basket amount of AED ${Number(t.originalAmount || 0).toFixed(2)}.
+The deduction of AED ${Number(t.compensation || 0).toFixed(2)} for "Spilled / Damaged" cannot be applied, as the order was properly packed and handed over in perfect condition. The damage occurred during delivery due to driver mishandling and is not the restaurant's responsibility.
+We kindly request reversal of this adjustment.
+Best regards,
+${t.branch}`;
+        break;
+        
+      case 'no_evidence':
+        body = `Subject: Dispute Rejection – Order ${t.orderId}
+Dear ${t.platform} Support Team,
+This is regarding Order ${t.orderId} from ${t.branch} on ${formatDateISO(t.orderDate)}, with a basket amount of AED ${Number(t.originalAmount || 0).toFixed(2)}.
+We have noted the deduction of AED ${Number(t.compensation || 0).toFixed(2)} for "${t.issue}". No verifiable evidence has been provided to justify this adjustment, as required under platform policy and UAE Consumer Protection Law.
+Therefore, we reject this deduction and request immediate reversal.
+Best regards,
+${t.branch}`;
+        break;
+        
+      case 'video_proof':
+        body = `Subject: Dispute Rejection – Order ${t.orderId}
+Dear ${t.platform} Support Team,
+This is regarding Order ${t.orderId} from ${t.branch} on ${formatDateISO(t.orderDate)}.
+The deduction of AED ${Number(t.compensation || 0).toFixed(2)} for "${t.issue}" is rejected. The attached video clearly shows the order was fully prepared and delivered correctly.
+Please reverse the adjustment accordingly.
+Best regards,
+${t.branch}`;
+        break;
+      
+      default:
+        body = `Order ID: ${t.orderId}\nDate: ${formatDateISO(t.orderDate)}\nBranch: ${t.branch}\nPlatform: ${t.platform}\nCase: ${t.issue}\nOriginal Amount: AED ${Number(t.originalAmount || 0).toFixed(2)}\nCompensation: AED ${Number(t.compensation || 0).toFixed(2)}\nRefunded: AED ${Number(t.refundedAmount || 0).toFixed(2)}\nStatus: ${t.status}`;
+    }
+    
     window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     t.status = 'Sent';
     save();
@@ -1790,19 +1976,46 @@
   function sendWhatsApp(id) {
     const t = tickets.find(x => x.id === id); 
     if (!t) return;
+    
+    const templateType = getTemplateType(t);
     const bn = branchWhats[t.branch] || '';
-    const msg = `Compensation Case\nOrder: ${t.orderId}\nBranch: ${t.branch}\nCase: ${t.issue}\nOriginal Amount: AED ${Number(t.originalAmount || 0).toFixed(2)}\nCompensation: AED ${Number(t.compensation || 0).toFixed(2)}\nRefunded: AED ${Number(t.refundedAmount || 0).toFixed(2)}`;
-    if (bn) {
-      window.open(`https://wa.me/${bn}?text=${encodeURIComponent(msg)}`, '_blank');
-    } else {
-      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    
+    let message = '';
+    
+    switch (templateType) {
+      case 'missing_incorrect':
+        message = `Dispute Rejection - Order ${t.orderId}\nDear ${t.platform} Support Team,\n\nThis is regarding Order ${t.orderId} from ${t.branch} on ${formatDateISO(t.orderDate)}, with a basket amount of AED ${Number(t.originalAmount || 0).toFixed(2)}.\n\nWe have noted the deduction of AED ${Number(t.compensation || 0).toFixed(2)} for "${t.issue}". After reviewing our records and attached video evidence, the order was fully prepared and delivered as requested.\n\nWe therefore reject this adjustment and request reversal.\n\nBest regards,\n${t.branch}`;
+        break;
+        
+      case 'driver_fault':
+        message = `Dispute Rejection - Order ${t.orderId}\nDear ${t.platform} Support Team,\n\nThis is regarding Order ${t.orderId} from ${t.branch} on ${formatDateISO(t.orderDate)}, with a basket amount of AED ${Number(t.originalAmount || 0).toFixed(2)}.\n\nThe deduction of AED ${Number(t.compensation || 0).toFixed(2)} for "Spilled / Damaged" cannot be applied, as the order was properly packed and handed over in perfect condition. The damage occurred during delivery due to driver mishandling and is not the restaurant's responsibility.\n\nWe kindly request reversal of this adjustment.\n\nBest regards,\n${t.branch}`;
+        break;
+        
+      case 'no_evidence':
+        message = `Dispute Rejection - Order ${t.orderId}\nDear ${t.platform} Support Team,\n\nThis is regarding Order ${t.orderId} from ${t.branch} on ${formatDateISO(t.orderDate)}, with a basket amount of AED ${Number(t.originalAmount || 0).toFixed(2)}.\n\nWe have noted the deduction of AED ${Number(t.compensation || 0).toFixed(2)} for "${t.issue}". No verifiable evidence has been provided to justify this adjustment, as required under platform policy and UAE Consumer Protection Law.\n\nTherefore, we reject this deduction and request immediate reversal.\n\nBest regards,\n${t.branch}`;
+        break;
+        
+      case 'video_proof':
+        message = `Dispute Rejection - Order ${t.orderId}\nDear ${t.platform} Support Team,\n\nThis is regarding Order ${t.orderId} from ${t.branch} on ${formatDateISO(t.orderDate)}.\n\nThe deduction of AED ${Number(t.compensation || 0).toFixed(2)} for "${t.issue}" is rejected. The attached video clearly shows the order was fully prepared and delivered correctly.\n\nPlease reverse the adjustment accordingly.\n\nBest regards,\n${t.branch}`;
+        break;
+      
+      default:
+        message = `Order ID: ${t.orderId}\nDate: ${formatDateISO(t.orderDate)}\nBranch: ${t.branch}\nPlatform: ${t.platform}\nCase: ${t.issue}\nOriginal Amount: AED ${Number(t.originalAmount || 0).toFixed(2)}\nCompensation: AED ${Number(t.compensation || 0).toFixed(2)}\nRefunded: AED ${Number(t.refundedAmount || 0).toFixed(2)}\nStatus: ${t.status}`;
     }
+    
+    if (bn) {
+      window.open(`https://wa.me/${bn}?text=${encodeURIComponent(message)}`, '_blank');
+    } else {
+      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+    }
+    
     t.status = 'Sent';
     save();
     renderAll();
     showNotif('WhatsApp opened', 'success');
   }
   
+  // ===== Other actions =====
   function copyTicket(id) {
     const t = tickets.find(x => x.id === id); 
     if (!t) return;
@@ -1870,6 +2083,63 @@
     }; 
   }
   
+  // ===== Check for duplicate order IDs =====
+  function checkDuplicateOrder(orderId, platform, excludeId = null) {
+    const filteredTickets = excludeId 
+      ? tickets.filter(t => t.id !== excludeId)
+      : tickets;
+    
+    return filteredTickets.some(ticket => {
+      if (platform === 'Careem' && ticket.orderId === orderId) {
+        return true;
+      }
+      if (platform === 'Noon' && ticket.orderId === orderId) {
+        return true;
+      }
+      return false;
+    });
+  }
+  
+  // ===== Check for duplicates while typing =====
+  document.getElementById('f_orderId').addEventListener('input', function(e) {
+    const orderId = e.target.value.trim();
+    const platform = document.getElementById('f_platform').value;
+    const id = document.getElementById('editingId').value;
+    
+    if (!orderId || !platform) {
+      document.getElementById('duplicateWarning').classList.remove('show');
+      return;
+    }
+    
+    const isDuplicate = checkDuplicateOrder(orderId, platform, id);
+    
+    if (isDuplicate) {
+      document.getElementById('duplicateWarning').classList.add('show');
+      document.getElementById('duplicateWarning').textContent = 'This order ID already exists!';
+    } else {
+      document.getElementById('duplicateWarning').classList.remove('show');
+    }
+  });
+  
+  document.getElementById('f_platform').addEventListener('change', function(e) {
+    const orderId = document.getElementById('f_orderId').value.trim();
+    const id = document.getElementById('editingId').value;
+    
+    if (!orderId) {
+      document.getElementById('duplicateWarning').classList.remove('show');
+      return;
+    }
+    
+    const isDuplicate = checkDuplicateOrder(orderId, e.target.value, id);
+    
+    if (isDuplicate) {
+      document.getElementById('duplicateWarning').classList.add('show');
+      document.getElementById('duplicateWarning').textContent = 'This order ID already exists!';
+    } else {
+      document.getElementById('duplicateWarning').classList.remove('show');
+    }
+  });
+  
   // ===== Export functions =====
   function exportExcel() {
     const wb = XLSX.utils.book_new();
@@ -1928,6 +2198,7 @@
       const ticketsEl = document.getElementById('ticketsContainer');
       const caseAnalysisEl = document.querySelector('.case-analysis-section');
       const refundAnalysisEl = document.querySelector('.refund-analysis-section');
+      const compensationAnalysisEl = document.querySelector('.compensation-analysis-section');
       
       // Render each section to canvas
       const canvas1 = await html2canvas(summaryEl, { scale: 1.5, useCORS: true });
@@ -1935,6 +2206,7 @@
       const canvas3 = await html2canvas(ticketsEl, { scale: 1.5, useCORS: true });
       const canvas4 = await html2canvas(caseAnalysisEl, { scale: 1.5, useCORS: true });
       const canvas5 = await html2canvas(refundAnalysisEl, { scale: 1.5, useCORS: true });
+      const canvas6 = await html2canvas(compensationAnalysisEl, { scale: 1.5, useCORS: true });
       
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -1979,6 +2251,14 @@
       const img5W = pageW - 20;
       const img5H = img5Props.height * img5W / img5Props.width;
       pdf.addImage(img5, 'PNG', 10, 10, img5W, img5H);
+      
+      // Sixth page: compensation analysis
+      pdf.addPage();
+      const img6 = canvas6.toDataURL('image/png');
+      const img6Props = pdf.getImageProperties(img6);
+      const img6W = pageW - 20;
+      const img6H = img6Props.height * img6W / img6Props.width;
+      pdf.addImage(img6, 'PNG', 10, 10, img6W, img6H);
       
       pdf.save(`dashboard_summary_${new Date().toISOString().slice(0, 10)}.pdf`);
     } catch (err) { 
@@ -2041,6 +2321,22 @@
     showNotif('Usability log exported', 'success');
   }
   
+  // ===== Setup listeners =====
+  function setupListeners() {
+    // Close dock on outside click
+    document.addEventListener('click', (e) => {
+      if (!dock.contains(e.target) && dockPanel.classList.contains('show')) {
+        dockPanel.classList.remove('show');
+      }
+    });
+    
+    // Auto-grow init
+    document.querySelectorAll('textarea.autogrow').forEach(t => autogrow(t));
+    
+    // Populate branch selects
+    populateBranchFilters();
+  }
+  
   // ===== Helpers =====
   function sleep(ms) { return new Promise(res => setTimeout(res, ms)); }
   function escapeHtml(s = '') { 
@@ -2062,79 +2358,6 @@
       } 
     }; 
   }
-  
-  // ===== Setup listeners =====
-  function setupListeners() {
-    // Close dock on outside click
-    document.addEventListener('click', (e) => {
-      if (!dock.contains(e.target) && dockPanel.classList.contains('show')) {
-        dockPanel.classList.remove('show');
-      }
-    });
-    
-    // Auto-grow init
-    document.querySelectorAll('textarea.autogrow').forEach(t => autogrow(t));
-    
-    // Populate branch selects
-    populateBranchFilters();
-  }
-  
-  // ===== Check for duplicate order IDs =====
-  function checkDuplicateOrder(orderId, platform, excludeId = null) {
-    const filteredTickets = excludeId 
-      ? tickets.filter(t => t.id !== excludeId)
-      : tickets;
-    
-    return filteredTickets.some(ticket => {
-      if (platform === 'Careem' && ticket.orderId === orderId) {
-        return true;
-      }
-      if (platform === 'Noon' && ticket.orderId === orderId) {
-        return true;
-      }
-      return false;
-    });
-  }
-  
-  // ===== Check for duplicates while typing =====
-  document.getElementById('f_orderId').addEventListener('input', function(e) {
-    const orderId = e.target.value.trim();
-    const platform = document.getElementById('f_platform').value;
-    const id = document.getElementById('editingId').value;
-    
-    if (!orderId || !platform) {
-      document.getElementById('duplicateWarning').classList.remove('show');
-      return;
-    }
-    
-    const isDuplicate = checkDuplicateOrder(orderId, platform, id);
-    
-    if (isDuplicate) {
-      document.getElementById('duplicateWarning').classList.add('show');
-      document.getElementById('duplicateWarning').textContent = 'This order ID already exists!';
-    } else {
-      document.getElementById('duplicateWarning').classList.remove('show');
-    }
-  });
-  
-  document.getElementById('f_platform').addEventListener('change', function(e) {
-    const orderId = document.getElementById('f_orderId').value.trim();
-    const id = document.getElementById('editingId').value;
-    
-    if (!orderId) {
-      document.getElementById('duplicateWarning').classList.remove('show');
-      return;
-    }
-    
-    const isDuplicate = checkDuplicateOrder(orderId, e.target.value, id);
-    
-    if (isDuplicate) {
-      document.getElementById('duplicateWarning').classList.add('show');
-      document.getElementById('duplicateWarning').textContent = 'This order ID already exists!';
-    } else {
-      document.getElementById('duplicateWarning').classList.remove('show');
-    }
-  });
   </script>
 </body>
 </html>
