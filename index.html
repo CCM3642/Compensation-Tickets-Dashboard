@@ -75,6 +75,26 @@
     .case-reason-bar{width:100%;height:8px;background:#e9ecef;border-radius:4px;margin-top:6px;overflow:hidden;}
     .case-reason-progress{height:100%;background:var(--crispy-red);border-radius:4px;}
     
+    /* Refund Analysis Section */
+    .refund-analysis-section{background:var(--card-bg);border-radius:16px;padding:30px;margin-bottom:30px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.05);}
+    .refund-analysis-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;}
+    .refund-analysis-header h5{font-size:1.4rem;font-weight:700;margin:0;color:var(--text-primary);}
+    .refund-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-bottom:25px;}
+    .refund-card{background:#f8f9fa;border-radius:12px;padding:20px;border:1px solid rgba(0,0,0,0.05);}
+    .refund-card h6{font-size:1.1rem;font-weight:700;margin-bottom:15px;color:var(--crispy-dark);}
+    .refund-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+    .refund-metric-item{text-align:center;padding:16px;background:var(--card-bg);border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.05);}
+    .refund-metric-value{font-size:1.3rem;font-weight:700;color:var(--crispy-red);margin-bottom:4px;}
+    .refund-metric-label{font-size:0.85rem;color:var(--text-secondary);font-weight:500;}
+    .refund-chart-container{height:200px;margin-top:20px;}
+    .refund-table-container{margin-top:20px;max-height:300px;overflow-y:auto;}
+    .refund-table{width:100%;border-collapse:collapse;}
+    .refund-table th{background:#f1f3f5;padding:12px;text-align:left;font-weight:600;font-size:0.9rem;}
+    .refund-table td{padding:12px;border-bottom:1px solid #eee;}
+    .refund-table tr:hover{background:#f8f9fa;}
+    .refund-status-badge{padding:4px 8px;border-radius:12px;font-size:0.8rem;font-weight:600;}
+    .status-refunded{background:#d4edda;color:#155724;}
+    
     /* Enhanced Tickets Section */
     .tickets-section{background:var(--card-bg);border-radius:16px;padding:24px;box-shadow:var(--shadow);margin-bottom:30px;border:1px solid rgba(0,0,0,0.05);}
     .tickets-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
@@ -99,6 +119,9 @@
     
     /* High compensation highlight */
     .high-compensation{background-color:rgba(255,235,238,0.5) !important;}
+    
+    /* Refunded highlight */
+    .refunded-case{background-color:rgba(220,242,220,0.5) !important;}
     
     /* Enhanced Modal */
     .modal-content{border-radius:16px;border:none;box-shadow:0 10px 30px rgba(0,0,0,0.15);}
@@ -184,6 +207,7 @@
       .branch-stats{grid-template-columns:repeat(2,1fr);}
       .summary-grid{grid-template-columns:1fr;}
       .chart-row{grid-template-columns:1fr;}
+      .refund-grid{grid-template-columns:1fr;}
     }
     @media (max-width: 768px){
       .stats-grid{grid-template-columns:1fr;}
@@ -270,14 +294,14 @@
               <div class="metric-change" id="compensationChange">+0%</div>
             </div>
             <div class="metric-item">
-              <div class="metric-value" id="avgCompensation">0</div>
-              <div class="metric-label">Avg. Compensation</div>
-              <div class="metric-change" id="avgCompensationChange">+0%</div>
+              <div class="metric-value" id="totalRefunded">0</div>
+              <div class="metric-label">Total Refunded</div>
+              <div class="metric-change" id="refundedChange">+0%</div>
             </div>
             <div class="metric-item">
-              <div class="metric-value" id="compensationRate">0%</div>
-              <div class="metric-label">Compensation Rate</div>
-              <div class="metric-change" id="compensationRateChange">+0%</div>
+              <div class="metric-value" id="netCompensation">0</div>
+              <div class="metric-label">Net Compensation</div>
+              <div class="metric-change" id="netCompensationChange">+0%</div>
             </div>
           </div>
           <div class="chart-row">
@@ -304,14 +328,14 @@
               <div class="metric-change" id="careemTicketsChange">+0%</div>
             </div>
             <div class="metric-item">
-              <div class="metric-value" id="noonCompensation">0</div>
-              <div class="metric-label">Noon Compensation</div>
-              <div class="metric-change" id="noonCompensationChange">+0%</div>
+              <div class="metric-value" id="noonRefunded">0</div>
+              <div class="metric-label">Noon Refunded</div>
+              <div class="metric-change" id="noonRefundedChange">+0%</div>
             </div>
             <div class="metric-item">
-              <div class="metric-value" id="careemCompensation">0</div>
-              <div class="metric-label">Careem Compensation</div>
-              <div class="metric-change" id="careemCompensationChange">+0%</div>
+              <div class="metric-value" id="careemRefunded">0</div>
+              <div class="metric-label">Careem Refunded</div>
+              <div class="metric-change" id="careemRefundedChange">+0%</div>
             </div>
           </div>
           <div class="chart-row">
@@ -405,6 +429,65 @@
       <div id="branchAnalysisContainer"></div>
     </section>
     
+    <!-- Refund Analysis Section -->
+    <section class="refund-analysis-section">
+      <div class="refund-analysis-header">
+        <h5>Refund Analysis</h5>
+        <div class="text-muted">
+          <i class="bi bi-arrow-repeat me-1"></i>
+          Refunded Compensation Tracking
+        </div>
+      </div>
+      <div class="refund-grid">
+        <div class="refund-card">
+          <h6>Overall Refunds</h6>
+          <div class="refund-metrics">
+            <div class="refund-metric-item">
+              <div class="refund-metric-value" id="totalRefundedAmount">0</div>
+              <div class="refund-metric-label">Total Refunded Amount</div>
+            </div>
+            <div class="refund-metric-item">
+              <div class="refund-metric-value" id="refundedCasesCount">0</div>
+              <div class="refund-metric-label">Refunded Cases</div>
+            </div>
+            <div class="refund-metric-item">
+              <div class="refund-metric-value" id="refundRate">0%</div>
+              <div class="refund-metric-label">Refund Rate</div>
+            </div>
+            <div class="refund-metric-item">
+              <div class="refund-metric-value" id="avgRefundedAmount">0</div>
+              <div class="refund-metric-label">Avg. Refunded Amount</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="refund-card">
+          <h6>Refunds by Branch</h6>
+          <div class="refund-chart-container">
+            <canvas id="refundBranchChart"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <div class="refund-table-container">
+        <table class="refund-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Branch</th>
+              <th>Original Amount</th>
+              <th>Compensation</th>
+              <th>Refunded Amount</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="refundTableBody">
+          </tbody>
+        </table>
+      </div>
+    </section>
+    
     <!-- Enhanced Tickets Section -->
     <section class="tickets-section">
       <div class="tickets-header">
@@ -479,6 +562,21 @@
               <div class="col-md-6">
                 <label class="form-label">Compensation (AED)</label>
                 <input id="f_compensation" type="number" min="0" step="0.01" class="form-control" required>
+              </div>
+              
+              <!-- Refund Section -->
+              <div class="col-md-6">
+                <label class="form-label">Refunded Amount (AED)</label>
+                <input id="f_refundedAmount" type="number" min="0" step="0.01" class="form-control" value="0">
+                <div class="form-check mt-2">
+                  <input id="f_isRefunded" type="checkbox" class="form-check-input">
+                  <label class="form-check-label" for="f_isRefunded">Mark as refunded</label>
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <label class="form-label">Refund Date</label>
+                <input id="f_refundDate" type="date" class="form-control">
               </div>
               
               <!-- Evidence Section -->
@@ -632,6 +730,7 @@
   let amountChart = null, statusChart = null;
   let platformTicketsChart = null, platformCompensationChart = null;
   let branchCasesChart = null, caseTypesChart = null;
+  let refundBranchChart = null;
   
   // Heatmap
   let heatmapInstance = null;
@@ -726,11 +825,13 @@
         branchSummary[ticket.branch] = {
           totalCases: 0,
           totalCompensation: 0,
+          totalRefunded: 0,
           cases: []
         };
       }
       branchSummary[ticket.branch].totalCases++;
       branchSummary[ticket.branch].totalCompensation += ticket.compensation || 0;
+      branchSummary[ticket.branch].totalRefunded += ticket.refundedAmount || 0;
       branchSummary[ticket.branch].cases.push(ticket);
     });
     
@@ -751,6 +852,10 @@
                 <div class="daily-stat-value">AED ${summary.totalCompensation.toFixed(2)}</div>
                 <div class="daily-stat-label">Compensation</div>
               </div>
+              <div class="daily-stat">
+                <div class="daily-stat-value">AED ${summary.totalRefunded.toFixed(2)}</div>
+                <div class="daily-stat-label">Refunded</div>
+              </div>
             </div>
           </div>
           <div class="mt-3">
@@ -760,14 +865,22 @@
       
       summary.cases.forEach(ticket => {
         const compensationClass = ticket.compensation > 25 ? 'list-group-item-danger' : '';
+        const refundedClass = ticket.isRefunded ? 'list-group-item-success' : '';
+        const rowClass = compensationClass + (refundedClass ? ' ' + refundedClass : '');
+        
         html += `
-          <li class="list-group-item ${compensationClass} d-flex justify-content-between align-items-center">
+          <li class="list-group-item ${rowClass} d-flex justify-content-between align-items-center">
             <div>
               <strong>${ticket.orderId}</strong> - ${ticket.issue.substring(0, 50)}...
-              <div class="text-muted small">Original: AED ${ticket.originalAmount || 0} | Compensation: AED ${ticket.compensation || 0}</div>
+              <div class="text-muted small">
+                Original: AED ${ticket.originalAmount || 0} | 
+                Compensation: AED ${ticket.compensation || 0} | 
+                Refunded: AED ${ticket.refundedAmount || 0}
+              </div>
             </div>
             <div>
               <span class="badge bg-${ticket.status === 'Open' ? 'primary' : ticket.status === 'Sent' ? 'warning' : 'success'}">${ticket.status}</span>
+              ${ticket.isRefunded ? '<span class="badge bg-success ms-1">Refunded</span>' : ''}
             </div>
           </li>
         `;
@@ -800,6 +913,7 @@
             .daily-stat { text-align: center; }
             .daily-stat-value { font-weight: bold; font-size: 1.1rem; }
             .list-group-item-danger { background-color: #ffebee; }
+            .list-group-item-success { background-color: #d4edda; }
           </style>
         </head>
         <body>
@@ -820,6 +934,7 @@
     updatePlatformStats();
     renderCharts();
     renderCaseAnalysis();
+    renderRefundAnalysis();
     renderSummary();
   }
   
@@ -864,6 +979,7 @@
               <th>Status</th>
               <th>Original Amount</th>
               <th>Compensation</th>
+              <th>Refunded</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -884,11 +1000,13 @@
           ? '<span class="badge bg-warning">Sent</span>' 
           : '<span class="badge bg-success">Closed</span>';
       
-      // Add highlight class for high compensation
+      // Add highlight class for high compensation or refunded
       const rowClass = t.compensation > 25 ? 'high-compensation' : '';
+      const refundedClass = t.isRefunded ? 'refunded-case' : '';
+      const finalRowClass = rowClass + (refundedClass ? ' ' + refundedClass : '');
       
       html += `
-        <tr class="${rowClass}">
+        <tr class="${finalRowClass}">
           <td><span class="ticket-order-id">${t.orderId}</span></td>
           <td>${formatDateISO(t.orderDate)}</td>
           <td>${t.branch}</td>
@@ -898,6 +1016,12 @@
           <td>${statusBadge}</td>
           <td>AED ${Number(t.originalAmount || 0).toFixed(2)}</td>
           <td>AED ${Number(t.compensation || 0).toFixed(2)}</td>
+          <td>
+            ${t.isRefunded ? 
+              `<span class="badge bg-success">AED ${Number(t.refundedAmount || 0).toFixed(2)}</span>` : 
+              '<span class="text-muted">-</span>'
+            }
+          </td>
           <td>
             <div class="ticket-actions">
               <button class="btn btn-sm btn-outline-primary" title="Edit" onclick="editTicket('${t.id}')">
@@ -948,11 +1072,97 @@
     document.getElementById('careemPercentage').textContent = ((careem / total) * 100).toFixed(1) + '%';
   }
   
+  // ===== Refund Analysis =====
+  function renderRefundAnalysis() {
+    // Calculate refund metrics
+    const totalRefunded = tickets.reduce((sum, t) => sum + (t.refundedAmount || 0), 0);
+    const refundedCases = tickets.filter(t => t.isRefunded).length;
+    const refundRate = tickets.length > 0 ? (refundedCases / tickets.length) * 100 : 0;
+    const avgRefunded = refundedCases > 0 ? totalRefunded / refundedCases : 0;
+    
+    // Update refund metrics
+    document.getElementById('totalRefundedAmount').textContent = 'AED ' + totalRefunded.toFixed(2);
+    document.getElementById('refundedCasesCount').textContent = refundedCases;
+    document.getElementById('refundRate').textContent = refundRate.toFixed(1) + '%';
+    document.getElementById('avgRefundedAmount').textContent = 'AED ' + avgRefunded.toFixed(2);
+    
+    // Platform refunds
+    const noonRefunded = tickets.filter(t => t.platform === 'Noon' && t.isRefunded).length;
+    const careemRefunded = tickets.filter(t => t.platform === 'Careem' && t.isRefunded).length;
+    document.getElementById('noonRefunded').textContent = noonRefunded;
+    document.getElementById('careemRefunded').textContent = careemRefunded;
+    
+    // Branch refunds chart
+    const branchRefunds = {};
+    tickets.forEach(t => {
+      if (t.isRefunded) {
+        branchRefunds[t.branch] = (branchRefunds[t.branch] || 0) + (t.refundedAmount || 0);
+      }
+    });
+    
+    const ctx = document.getElementById('refundBranchChart').getContext('2d');
+    if (refundBranchChart) refundBranchChart.destroy();
+    
+    refundBranchChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(branchRefunds),
+        datasets: [{
+          label: 'Refunded Amount (AED)',
+          data: Object.values(branchRefunds),
+          backgroundColor: '#28a745'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+    
+    // Refund table
+    const refundTableBody = document.getElementById('refundTableBody');
+    refundTableBody.innerHTML = '';
+    
+    const refundedTickets = tickets.filter(t => t.isRefunded).sort((a, b) => 
+      new Date(b.refundDate || 0) - new Date(a.refundDate || 0)
+    );
+    
+    refundedTickets.forEach(ticket => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${ticket.orderId}</td>
+        <td>${ticket.branch}</td>
+        <td>AED ${Number(ticket.originalAmount || 0).toFixed(2)}</td>
+        <td>AED ${Number(ticket.compensation || 0).toFixed(2)}</td>
+        <td>AED ${Number(ticket.refundedAmount || 0).toFixed(2)}</td>
+        <td><span class="refund-status-badge status-refunded">Refunded</span></td>
+        <td>${ticket.refundDate || '-'}</td>
+      `;
+      refundTableBody.appendChild(row);
+    });
+    
+    if (refundedTickets.length === 0) {
+      refundTableBody.innerHTML = `
+        <tr>
+          <td colspan="7" class="text-center text-muted">No refunded cases found</td>
+        </tr>
+      `;
+    }
+  }
+  
   // ===== Summary Section =====
   function renderSummary() {
     // Financial Overview
     const totalOriginal = tickets.reduce((sum, t) => sum + (t.originalAmount || 0), 0);
     const totalComp = tickets.reduce((sum, t) => sum + (t.compensation || 0), 0);
+    const totalRefunded = tickets.reduce((sum, t) => sum + (t.refundedAmount || 0), 0);
+    const netCompensation = totalComp - totalRefunded;
     const avgComp = tickets.filter(t => t.compensation > 0).length > 0 
       ? totalComp / tickets.filter(t => t.compensation > 0).length 
       : 0;
@@ -960,7 +1170,8 @@
     
     document.getElementById('totalOriginalAmount').textContent = 'AED ' + totalOriginal.toFixed(2);
     document.getElementById('totalCompensation').textContent = 'AED ' + totalComp.toFixed(2);
-    document.getElementById('avgCompensation').textContent = 'AED ' + avgComp.toFixed(2);
+    document.getElementById('totalRefunded').textContent = 'AED ' + totalRefunded.toFixed(2);
+    document.getElementById('netCompensation').textContent = 'AED ' + netCompensation.toFixed(2);
     document.getElementById('compensationRate').textContent = compensationRate.toFixed(1) + '%';
     
     // Platform Performance
@@ -968,11 +1179,13 @@
     const careemTickets = tickets.filter(t => t.platform === 'Careem').length;
     const noonComp = tickets.filter(t => t.platform === 'Noon').reduce((sum, t) => sum + (t.compensation || 0), 0);
     const careemComp = tickets.filter(t => t.platform === 'Careem').reduce((sum, t) => sum + (t.compensation || 0), 0);
+    const noonRef = tickets.filter(t => t.platform === 'Noon' && t.isRefunded).reduce((sum, t) => sum + (t.refundedAmount || 0), 0);
+    const careemRef = tickets.filter(t => t.platform === 'Careem' && t.isRefunded).reduce((sum, t) => sum + (t.refundedAmount || 0), 0);
     
     document.getElementById('noonTickets').textContent = noonTickets;
     document.getElementById('careemTickets').textContent = careemTickets;
-    document.getElementById('noonCompensation').textContent = 'AED ' + noonComp.toFixed(2);
-    document.getElementById('careemCompensation').textContent = 'AED ' + careemComp.toFixed(2);
+    document.getElementById('noonRefunded').textContent = 'AED ' + noonRef.toFixed(2);
+    document.getElementById('careemRefunded').textContent = 'AED ' + careemRef.toFixed(2);
     
     // Branch Performance
     const branchCounts = {};
@@ -1005,13 +1218,14 @@
     amountChart = new Chart(ctx1, {
       type: 'doughnut',
       data: {
-        labels: ['Original Amount', 'Compensation'],
+        labels: ['Original Amount', 'Compensation', 'Refunded'],
         datasets: [{
           data: [
             tickets.reduce((sum, t) => sum + (t.originalAmount || 0), 0),
-            tickets.reduce((sum, t) => sum + (t.compensation || 0), 0)
+            tickets.reduce((sum, t) => sum + (t.compensation || 0), 0),
+            tickets.reduce((sum, t) => sum + (t.refundedAmount || 0), 0)
           ],
-          backgroundColor: ['#0d6efd', '#dc3545']
+          backgroundColor: ['#0d6efd', '#dc3545', '#28a745']
         }]
       },
       options: {
@@ -1032,14 +1246,15 @@
     statusChart = new Chart(ctx2, {
       type: 'bar',
       data: {
-        labels: ['Open', 'Sent', 'Closed'],
+        labels: ['Open', 'Sent', 'Closed', 'Refunded'],
         datasets: [{
           data: [
             tickets.filter(t => t.status === 'Open').length,
             tickets.filter(t => t.status === 'Sent').length,
-            tickets.filter(t => t.status === 'Closed').length
+            tickets.filter(t => t.status === 'Closed').length,
+            tickets.filter(t => t.isRefunded).length
           ],
-          backgroundColor: ['#0d6efd', '#ffc107', '#198754']
+          backgroundColor: ['#0d6efd', '#ffc107', '#198754', '#28a745']
         }]
       },
       options: {
@@ -1088,20 +1303,33 @@
       type: 'bar',
       data: {
         labels: ['Noon', 'Careem'],
-        datasets: [{
-          label: 'Compensation (AED)',
-          data: [
-            tickets.filter(t => t.platform === 'Noon').reduce((sum, t) => sum + (t.compensation || 0), 0),
-            tickets.filter(t => t.platform === 'Careem').reduce((sum, t) => sum + (t.compensation || 0), 0)
-          ],
-          backgroundColor: ['#ff7043', '#7e57c2']
-        }]
+        datasets: [
+          {
+            label: 'Compensation (AED)',
+            data: [
+              tickets.filter(t => t.platform === 'Noon').reduce((sum, t) => sum + (t.compensation || 0), 0),
+              tickets.filter(t => t.platform === 'Careem').reduce((sum, t) => sum + (t.compensation || 0), 0)
+            ],
+            backgroundColor: ['#ff7043', '#7e57c2']
+          },
+          {
+            label: 'Refunded (AED)',
+            data: [
+              tickets.filter(t => t.platform === 'Noon' && t.isRefunded).reduce((sum, t) => sum + (t.refundedAmount || 0), 0),
+              tickets.filter(t => t.platform === 'Careem' && t.isRefunded).reduce((sum, t) => sum + (t.refundedAmount || 0), 0)
+            ],
+            backgroundColor: ['#28a745', '#20c997']
+          }
+        ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: { display: false }
+          legend: {
+            position: 'bottom',
+            labels: { font: { size: 10 } }
+          }
         },
         scales: {
           y: { beginAtZero: true }
@@ -1419,6 +1647,9 @@
       issue: document.getElementById('f_issue').value.trim(),
       originalAmount: Number(document.getElementById('f_originalAmount').value || 0),
       compensation: Number(document.getElementById('f_compensation').value || 0),
+      refundedAmount: Number(document.getElementById('f_refundedAmount').value || 0),
+      isRefunded: document.getElementById('f_isRefunded').checked,
+      refundDate: document.getElementById('f_refundDate').value || null,
       evidence: document.getElementById('f_noEvidence').checked ? 'None' : (document.getElementById('f_shortLink').value || document.getElementById('f_evidenceBase64')?.value || 'None'),
       status: 'Open'
     };
@@ -1457,6 +1688,9 @@
     document.getElementById('f_issue').value = t.issue || '';
     document.getElementById('f_originalAmount').value = t.originalAmount || 0;
     document.getElementById('f_compensation').value = t.compensation || 0;
+    document.getElementById('f_refundedAmount').value = t.refundedAmount || 0;
+    document.getElementById('f_isRefunded').checked = t.isRefunded || false;
+    document.getElementById('f_refundDate').value = t.refundDate || '';
     
     // Handle evidence
     if (t.evidence && t.evidence !== 'None') {
@@ -1505,6 +1739,9 @@
         issue: 'Food was cold and delivery was late', 
         originalAmount: 85.00,
         compensation: 25.00, 
+        refundedAmount: 10.00,
+        isRefunded: true,
+        refundDate: new Date().toISOString().split('T')[0],
         evidence: 'None', 
         status: 'Open' 
       },
@@ -1517,6 +1754,8 @@
         issue: 'Wrong order items received', 
         originalAmount: 120.00,
         compensation: 45.00, 
+        refundedAmount: 0,
+        isRefunded: false,
         evidence: 'None', 
         status: 'Open' 
       }
@@ -1540,7 +1779,7 @@
     const t = tickets.find(x => x.id === id); 
     if (!t) return;
     const subject = `Compensation Case — Order ${t.orderId}`;
-    const body = `Order ID: ${t.orderId}\nDate: ${formatDateISO(t.orderDate)}\nBranch: ${t.branch}\nPlatform: ${t.platform}\nCase: ${t.issue}\nOriginal Amount: AED ${Number(t.originalAmount || 0).toFixed(2)}\nCompensation: AED ${Number(t.compensation || 0).toFixed(2)}\nStatus: ${t.status}`;
+    const body = `Order ID: ${t.orderId}\nDate: ${formatDateISO(t.orderDate)}\nBranch: ${t.branch}\nPlatform: ${t.platform}\nCase: ${t.issue}\nOriginal Amount: AED ${Number(t.originalAmount || 0).toFixed(2)}\nCompensation: AED ${Number(t.compensation || 0).toFixed(2)}\nRefunded: AED ${Number(t.refundedAmount || 0).toFixed(2)}\nStatus: ${t.status}`;
     window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     t.status = 'Sent';
     save();
@@ -1552,7 +1791,7 @@
     const t = tickets.find(x => x.id === id); 
     if (!t) return;
     const bn = branchWhats[t.branch] || '';
-    const msg = `Compensation Case\nOrder: ${t.orderId}\nBranch: ${t.branch}\nCase: ${t.issue}\nOriginal Amount: AED ${Number(t.originalAmount || 0).toFixed(2)}\nCompensation: AED ${Number(t.compensation || 0).toFixed(2)}`;
+    const msg = `Compensation Case\nOrder: ${t.orderId}\nBranch: ${t.branch}\nCase: ${t.issue}\nOriginal Amount: AED ${Number(t.originalAmount || 0).toFixed(2)}\nCompensation: AED ${Number(t.compensation || 0).toFixed(2)}\nRefunded: AED ${Number(t.refundedAmount || 0).toFixed(2)}`;
     if (bn) {
       window.open(`https://wa.me/${bn}?text=${encodeURIComponent(msg)}`, '_blank');
     } else {
@@ -1567,7 +1806,7 @@
   function copyTicket(id) {
     const t = tickets.find(x => x.id === id); 
     if (!t) return;
-    const txt = `Order ID: ${t.orderId}\nDate: ${formatDateISO(t.orderDate)}\nBranch: ${t.branch}\nPlatform: ${t.platform}\nCase: ${t.issue}\nOriginal Amount: AED ${Number(t.originalAmount || 0).toFixed(2)}\nCompensation: AED ${Number(t.compensation || 0).toFixed(2)}`;
+    const txt = `Order ID: ${t.orderId}\nDate: ${formatDateISO(t.orderDate)}\nBranch: ${t.branch}\nPlatform: ${t.platform}\nCase: ${t.issue}\nOriginal Amount: AED ${Number(t.originalAmount || 0).toFixed(2)}\nCompensation: AED ${Number(t.compensation || 0).toFixed(2)}\nRefunded: AED ${Number(t.refundedAmount || 0).toFixed(2)}`;
     navigator.clipboard.writeText(txt).then(() => showNotif('Copied to clipboard', 'success'), () => showNotif('Copy failed', 'error'));
   }
   
@@ -1642,6 +1881,9 @@
       Case: t.issue,
       OriginalAmount: t.originalAmount,
       Compensation: t.compensation,
+      RefundedAmount: t.refundedAmount,
+      IsRefunded: t.isRefunded,
+      RefundDate: t.refundDate,
       Evidence: t.evidence,
       Status: t.status,
       DateCreated: t.dateCreated || ''
@@ -1685,12 +1927,14 @@
       const reportsEl = document.getElementById('reports');
       const ticketsEl = document.getElementById('ticketsContainer');
       const caseAnalysisEl = document.querySelector('.case-analysis-section');
+      const refundAnalysisEl = document.querySelector('.refund-analysis-section');
       
       // Render each section to canvas
       const canvas1 = await html2canvas(summaryEl, { scale: 1.5, useCORS: true });
       const canvas2 = await html2canvas(reportsEl, { scale: 1.5, useCORS: true });
       const canvas3 = await html2canvas(ticketsEl, { scale: 1.5, useCORS: true });
       const canvas4 = await html2canvas(caseAnalysisEl, { scale: 1.5, useCORS: true });
+      const canvas5 = await html2canvas(refundAnalysisEl, { scale: 1.5, useCORS: true });
       
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -1727,6 +1971,14 @@
       const img4W = pageW - 20;
       const img4H = img4Props.height * img4W / img4Props.width;
       pdf.addImage(img4, 'PNG', 10, 10, img4W, img4H);
+      
+      // Fifth page: refund analysis
+      pdf.addPage();
+      const img5 = canvas5.toDataURL('image/png');
+      const img5Props = pdf.getImageProperties(img5);
+      const img5W = pageW - 20;
+      const img5H = img5Props.height * img5W / img5Props.width;
+      pdf.addImage(img5, 'PNG', 10, 10, img5W, img5H);
       
       pdf.save(`dashboard_summary_${new Date().toISOString().slice(0, 10)}.pdf`);
     } catch (err) { 
