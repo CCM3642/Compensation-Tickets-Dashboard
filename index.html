@@ -360,6 +360,16 @@
       background: rgba(255,255,255,0.5);
     }
     
+    /* Duplicate warning */
+    .duplicate-warning {
+      font-size: 0.85rem;
+      display: none;
+    }
+    
+    .duplicate-warning.show {
+      display: block;
+    }
+    
     /* Print styles */
     @media print{
       #dock, .tickets-header .btn, .action-buttons, .navbar, .modal, .notification, .commands-window { display:none !important; }
@@ -984,17 +994,27 @@
   
   // Init setup
   document.addEventListener('DOMContentLoaded', () => {
+    console.log('Initializing application...');
+    
     populateBranchFilters();
     
-    // تحميل البيانات من localStorage
-    const storedTickets = localStorage.getItem('crispyTickets');
-    if (storedTickets) {
-      tickets = JSON.parse(storedTickets);
-      console.log('Loaded tickets:', tickets.length);
+    // تحميل البيانات من localStorage مع معالجة الأخطاء
+    try {
+      const storedTickets = localStorage.getItem('crispyTickets');
+      if (storedTickets) {
+        tickets = JSON.parse(storedTickets);
+        console.log('Loaded tickets:', tickets.length);
+      } else {
+        console.log('No stored tickets found');
+      }
+    } catch (error) {
+      console.error('Error loading tickets from localStorage:', error);
+      tickets = [];
     }
     
     // إذا لم تكن هناك بيانات، أضف عينات
     if (tickets.length === 0) {
+      console.log('No tickets found, adding sample data...');
       addSample();
     } else {
       // إذا كانت هناك بيانات، قم بتحديث الواجهة
@@ -1007,6 +1027,8 @@
     
     // Initialize commands display
     updateCommandsDisplay();
+    
+    console.log('Application initialized successfully');
   });
   
   // ===== Commands tracking functions =====
@@ -1076,8 +1098,15 @@
   
   // ===== Utility =====
   function save() {
-    localStorage.setItem('crispyTickets', JSON.stringify(tickets));
-    console.log('Saved tickets:', tickets.length);
+    try {
+      localStorage.setItem('crispyTickets', JSON.stringify(tickets));
+      console.log('Saved tickets:', tickets.length);
+      return true;
+    } catch (error) {
+      console.error('Error saving tickets to localStorage:', error);
+      showNotif('Error saving data', 'error');
+      return false;
+    }
   }
   
   function showNotif(msg, type = 'success') {
@@ -1245,14 +1274,21 @@
   
   // ===== Render =====
   function renderAll() {
-    renderTickets();
-    updateStats();
-    updatePlatformStats();
-    renderCharts();
-    renderCaseAnalysis();
-    renderCompensationAnalysis();
-    renderRefundAnalysis();
-    renderSummary();
+    try {
+      console.log('Rendering dashboard...');
+      renderTickets();
+      updateStats();
+      updatePlatformStats();
+      renderCharts();
+      renderCaseAnalysis();
+      renderCompensationAnalysis();
+      renderRefundAnalysis();
+      renderSummary();
+      console.log('Dashboard rendered successfully');
+    } catch (error) {
+      console.error('Error rendering dashboard:', error);
+      showNotif('Error rendering dashboard', 'error');
+    }
   }
   
   function filteredTickets() {
@@ -1731,7 +1767,7 @@
       branchCounts[t.branch] = (branchCounts[t.branch] || 0) + 1;
     });
     branchCasesChart = new Chart(ctx5, {
-      type: 'horizontalBar',
+      type: 'bar',
       data: {
         labels: Object.keys(branchCounts),
         datasets: [{
@@ -2038,6 +2074,7 @@
   
   // ===== Enhanced Actions: Add / Edit / Close / Sample / Reset =====
   function openAddModal() {
+    console.log('Opening add modal...');
     document.getElementById('modalTitle').textContent = 'Add Compensation Case';
     document.getElementById('editingId').value = '';
     document.getElementById('ticketForm').reset();
@@ -2057,6 +2094,8 @@
   
   document.getElementById('ticketForm').addEventListener('submit', function(e) {
     e.preventDefault();
+    console.log('Form submitted...');
+    
     const id = document.getElementById('editingId').value;
     const payload = {
       orderId: document.getElementById('f_orderId').value.trim(),
@@ -2073,12 +2112,27 @@
       status: 'Open'
     };
     
+    console.log('Form payload:', payload);
+    
     if (!payload.orderId || !payload.orderDate || !payload.branch || !payload.platform || !payload.issue) {
       showNotif('Fill required fields', 'error');
       return;
     }
     
+    // Check for duplicate order ID
+    const isDuplicate = tickets.some(t => 
+      t.orderId === payload.orderId && 
+      t.platform === payload.platform &&
+      t.id !== id
+    );
+    
+    if (isDuplicate) {
+      showNotif('Order ID already exists on this platform', 'error');
+      return;
+    }
+    
     if (id) {
+      // Update existing ticket
       const idx = tickets.findIndex(t => t.id === id);
       if (idx > -1) { 
         tickets[idx] = { ...tickets[idx], ...payload }; 
@@ -2087,16 +2141,27 @@
         addCommand('Update Ticket', `Updated Order ${payload.orderId}`);
       }
     } else {
-      const newTicket = { id: Date.now().toString(), ...payload };
+      // Add new ticket
+      const newTicket = { 
+        id: Date.now().toString(), 
+        ...payload,
+        dateCreated: new Date().toISOString()
+      };
       tickets.unshift(newTicket); 
       showNotif('Case added', 'success');
       // Track command
       addCommand('Add Ticket', `Added Order ${payload.orderId}`);
     }
     
-    save(); 
-    renderAll();
-    bootstrap.Modal.getInstance(document.getElementById('ticketModal')).hide();
+    console.log('Tickets before save:', tickets.length);
+    
+    if (save()) {
+      console.log('Data saved successfully');
+      renderAll();
+      bootstrap.Modal.getInstance(document.getElementById('ticketModal')).hide();
+    } else {
+      showNotif('Error saving data', 'error');
+    }
   });
   
   function editTicket(id) {
@@ -2158,6 +2223,7 @@
   }
   
   function addSample() {
+    console.log('Adding sample data...');
     try {
       const sample = [
         { 
@@ -2173,7 +2239,8 @@
           isRefunded: true,
           refundDate: new Date().toISOString().split('T')[0],
           evidence: 'None', 
-          status: 'Open' 
+          status: 'Open',
+          dateCreated: new Date().toISOString()
         },
         { 
           id: Date.now().toString() + 'b', 
@@ -2187,7 +2254,8 @@
           refundedAmount: 0,
           isRefunded: false,
           evidence: 'None', 
-          status: 'Open' 
+          status: 'Open',
+          dateCreated: new Date().toISOString()
         }
       ];
       
@@ -2199,16 +2267,18 @@
       console.log('After adding sample:', tickets.length);
       
       // حفظ البيانات
-      localStorage.setItem('crispyTickets', JSON.stringify(tickets));
-      
-      // تحديث الواجهة
-      renderAll();
-      
-      // إظهار الإشعار
-      showNotif('Sample cases added successfully', 'success');
-      
-      // Track command
-      addCommand('Add Sample Cases', `Added ${sample.length} sample cases`);
+      if (save()) {
+        // تحديث الواجهة
+        renderAll();
+        
+        // إظهار الإشعار
+        showNotif('Sample cases added successfully', 'success');
+        
+        // Track command
+        addCommand('Add Sample Cases', `Added ${sample.length} sample cases`);
+      } else {
+        showNotif('Error saving sample data', 'error');
+      }
       
     } catch (error) {
       console.error('Error in addSample:', error);
@@ -2700,6 +2770,12 @@ ${t.branch}`;
         fn(...a); 
       } 
     }; 
+  }
+  
+  // Print function
+  function printReport() {
+    window.print();
+    addCommand('Print Report');
   }
   </script>
 </body>
