@@ -87,6 +87,18 @@
     .stat-value{font-size:1.3rem;font-weight:700;color:var(--crispy-red);margin-bottom:4px;}
     .stat-label{font-size:0.85rem;color:var(--text-secondary);font-weight:500;}
     
+    /* Rejection Analysis Section */
+    .rejection-analysis-section{background:var(--card-bg);border-radius:16px;padding:30px;margin-bottom:30px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.05);}
+    .rejection-analysis-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;}
+    .rejection-analysis-header h5{font-size:1.4rem;font-weight:700;margin:0;color:var(--text-primary);}
+    .rejection-analysis-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;}
+    .rejection-card{background:#f8f9fa;border-radius:12px;padding:20px;border:1px solid rgba(0,0,0,0.05);}
+    .rejection-card h6{font-size:1.1rem;font-weight:700;margin-bottom:15px;color:var(--crispy-dark);}
+    .rejection-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+    .rejection-metric-item{text-align:center;padding:16px;background:var(--card-bg);border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.05);}
+    .rejection-metric-value{font-size:1.3rem;font-weight:700;color:#dc3545;margin-bottom:4px;}
+    .rejection-metric-label{font-size:0.85rem;color:var(--text-secondary);font-weight:500;}
+    
     /* Refund Analysis Section */
     .refund-analysis-section{background:var(--card-bg);border-radius:16px;padding:30px;margin-bottom:30px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,0.05);}
     .refund-analysis-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;}
@@ -134,6 +146,9 @@
     
     /* Refunded highlight */
     .refunded-case{background-color:rgba(220,242,220,0.5) !important;}
+    
+    /* Rejected highlight */
+    .rejected-case{background-color:rgba(255,236,236,0.5) !important;}
     
     /* Enhanced Modal */
     .modal-content{border-radius:16px;border:none;box-shadow:0 10px 30px rgba(0,0,0,0.15);}
@@ -415,6 +430,7 @@
       .chart-row{grid-template-columns:1fr;}
       .refund-grid{grid-template-columns:1fr;}
       .compensation-analysis-grid{grid-template-columns:1fr;}
+      .rejection-analysis-grid{grid-template-columns:1fr;}
       .all-commands-container { 
         margin-top: 160px;
         margin-right: 0;
@@ -506,6 +522,10 @@
       <div class="stat-card text-center" style="border-left-color:#dc3545;">
         <div class="text-muted">Total Compensation</div>
         <h2 id="totalCompensationAmount" style="color:#dc3545;">0</h2>
+      </div>
+      <div class="stat-card text-center" style="border-left-color:#dc3545;">
+        <div class="text-muted">Rejected</div>
+        <h2 id="rejectedTickets" style="color:#dc3545;">0</h2>
       </div>
     </section>
     
@@ -680,6 +700,18 @@
       <div id="compensationAnalysisContainer"></div>
     </section>
     
+    <!-- Rejection Analysis Section -->
+    <section class="rejection-analysis-section">
+      <div class="rejection-analysis-header">
+        <h5>Rejection Analysis</h5>
+        <div class="text-muted">
+          <i class="bi bi-x-circle me-1"></i>
+          Analysis of rejected compensation cases
+        </div>
+      </div>
+      <div id="rejectionAnalysisContainer"></div>
+    </section>
+    
     <!-- Refund Analysis Section -->
     <section class="refund-analysis-section">
       <div class="refund-analysis-header">
@@ -752,6 +784,13 @@
             <option value="">All Platforms</option>
             <option>Noon</option>
             <option>Careem</option>
+          </select>
+          <select id="filterStatus" class="form-select filter-select">
+            <option value="">All Status</option>
+            <option>Open</option>
+            <option>Sent</option>
+            <option>Closed</option>
+            <option>Rejected</option>
           </select>
           <div class="action-buttons">
             <button class="btn btn-primary" onclick="openAddModal()">
@@ -953,6 +992,61 @@
     </div>
   </div>
   
+  <!-- Rejection Modal -->
+  <div class="modal fade" id="rejectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">رفض تعويض</h5>
+          <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="rejectionForm">
+            <div class="mb-3">
+              <label class="form-label">اختر الحالة</label>
+              <select id="rejectionCase" class="form-select" required>
+                <option value="">اختر حالة</option>
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">سبب الرفض</label>
+              <select id="rejectionReason" class="form-select" required>
+                <option value="">اختر السبب</option>
+                <option value="no_evidence">لا يوجد دليل</option>
+                <option value="incorrect_claim">الادعاء غير صحيح</option>
+                <option value="driver_fault">خطأ السائق</option>
+                <option value="customer_error">خطأ العميل</option>
+                <option value="other">أسباب أخرى</option>
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">ملاحظات إضافية</label>
+              <textarea id="rejectionNotes" class="form-control" rows="3"></textarea>
+            </div>
+            
+            <div class="mb-3">
+              <div class="form-check">
+                <input id="sendEmail" type="checkbox" class="form-check-input" checked>
+                <label class="form-check-label" for="sendEmail">إرسال بريد إلكتروني</label>
+              </div>
+              <div class="form-check">
+                <input id="sendWhatsApp" type="checkbox" class="form-check-input">
+                <label class="form-check-label" for="sendWhatsApp">إرسال عبر واتساب</label>
+              </div>
+            </div>
+            
+            <div class="d-flex justify-content-end gap-2">
+              <button type="submit" class="btn btn-danger">رفض التعويض</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
   <!-- Enhanced Notification -->
   <div id="notification" class="notification"></div>
   
@@ -967,6 +1061,9 @@
       </button>
       <button class="btn btn-outline-secondary" onclick="showDailySummary()" title="Daily branch summary">
         <i class="bi bi-calendar-day me-1"></i> Daily Summary
+      </button>
+      <button class="btn btn-outline-danger" onclick="openRejectionModal()" title="Reject compensation">
+        <i class="bi bi-x-circle me-1"></i> رفض تعويض
       </button>
       <button class="btn btn-outline-secondary" onclick="resetAll()" title="Reset all data">
         <i class="bi bi-arrow-clockwise me-1"></i> Reset
@@ -1028,6 +1125,7 @@
   const searchInput = document.getElementById('searchInput');
   const filterBranch = document.getElementById('filterBranch');
   const filterPlatform = document.getElementById('filterPlatform');
+  const filterStatus = document.getElementById('filterStatus');
   const notification = document.getElementById('notification');
   const dockToggle = document.getElementById('dockToggle');
   const dockPanel = document.getElementById('dockPanel');
@@ -1490,6 +1588,7 @@
       renderCharts();
       renderCaseAnalysis();
       renderCompensationAnalysis();
+      renderRejectionAnalysis();
       renderRefundAnalysis();
       renderSummary();
       updateStorageIndicator();
@@ -1504,9 +1603,11 @@
     const q = searchInput.value.trim().toLowerCase();
     const b = filterBranch.value;
     const p = filterPlatform.value;
+    const s = filterStatus.value;
     return tickets.filter(t => {
       if (b && t.branch !== b) return false;
       if (p && t.platform !== p) return false;
+      if (s && t.status !== s) return false;
       if (!q) return true;
       return (t.orderId || '').toString().toLowerCase().includes(q) ||
              (t.branch || '').toLowerCase().includes(q) ||
@@ -1556,16 +1657,23 @@
       const caseShort = `<span class="ticket-issue">${escapeHtml(t.issue)}</span>
         <button class="issue-expand" onclick="openIssueModal('${t.id}')">View</button>`;
       
-      const statusBadge = t.status === 'Open' 
-        ? '<span class="badge bg-primary">Open</span>' 
-        : t.status === 'Sent' 
-          ? '<span class="badge bg-warning">Sent</span>' 
-          : '<span class="badge bg-success">Closed</span>';
+      // Status badge with color coding
+      let statusBadge = '';
+      if (t.status === 'Open') {
+        statusBadge = '<span class="badge bg-primary">Open</span>';
+      } else if (t.status === 'Sent') {
+        statusBadge = '<span class="badge bg-warning">Sent</span>';
+      } else if (t.status === 'Closed') {
+        statusBadge = '<span class="badge bg-success">Closed</span>';
+      } else if (t.status === 'Rejected') {
+        statusBadge = '<span class="badge bg-danger">Rejected</span>';
+      }
       
       // Add highlight class for high compensation or refunded
       const rowClass = t.compensation > 25 ? 'high-compensation' : '';
       const refundedClass = t.isRefunded ? 'refunded-case' : '';
-      const finalRowClass = rowClass + (refundedClass ? ' ' + refundedClass : '');
+      const rejectedClass = t.status === 'Rejected' ? 'rejected-case' : '';
+      const finalRowClass = rowClass + (refundedClass ? ' ' + refundedClass : '') + (rejectedClass ? ' ' + rejectedClass : '');
       
       html += `
         <tr class="${finalRowClass}">
@@ -1598,7 +1706,10 @@
               <button class="btn btn-sm btn-outline-secondary" title="Copy" onclick="copyTicket('${t.id}')">
                 <i class="bi bi-clipboard"></i>
               </button>
-              <button class="btn btn-sm btn-outline-danger" title="Close" onclick="closeTicket('${t.id}')">
+              <button class="btn btn-sm btn-outline-danger" title="Reject" onclick="openRejectionModalForCase('${t.id}')">
+                <i class="bi bi-x-circle"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" title="Close" onclick="closeTicket('${t.id}')">
                 <i class="bi bi-check2-circle"></i>
               </button>
             </div>
@@ -1622,6 +1733,7 @@
     document.getElementById('openTickets').textContent = tickets.filter(t => t.status === 'Open').length;
     document.getElementById('sentTickets').textContent = tickets.filter(t => t.status === 'Sent').length;
     document.getElementById('closedTickets').textContent = tickets.filter(t => t.status === 'Closed').length;
+    document.getElementById('rejectedTickets').textContent = tickets.filter(t => t.status === 'Rejected').length;
     
     // إضافة مؤشر النزاعات المحلولة
     document.getElementById('resolvedDisputes').textContent = tickets.filter(t => t.status === 'Closed').length;
@@ -1787,6 +1899,98 @@
     document.getElementById('compensationAnalysisContainer').innerHTML = html;
   }
   
+  // ===== Rejection Analysis =====
+  function analyzeRejections() {
+    const rejectionReasons = {
+      'no_evidence': 0,
+      'incorrect_claim': 0,
+      'driver_fault': 0,
+      'customer_error': 0,
+      'other': 0
+    };
+    
+    const rejectionAmounts = {
+      'no_evidence': 0,
+      'incorrect_claim': 0,
+      'driver_fault': 0,
+      'customer_error': 0,
+      'other': 0
+    };
+    
+    tickets.forEach(ticket => {
+      if (ticket.status === 'Rejected' && ticket.rejectionReason) {
+        const reason = ticket.rejectionReason;
+        rejectionReasons[reason] = (rejectionReasons[reason] || 0) + 1;
+        rejectionAmounts[reason] = (rejectionAmounts[reason] || 0) + (ticket.compensation || 0);
+      }
+    });
+    
+    return { rejectionReasons, rejectionAmounts };
+  }
+  
+  function renderRejectionAnalysis() {
+    const analysis = analyzeRejections();
+    const rejectedCases = tickets.filter(t => t.status === 'Rejected');
+    
+    // إنشاء HTML لعرض التحليل
+    let html = '<div class="rejection-analysis-grid">';
+    
+    Object.keys(analysis.rejectionReasons).forEach(reason => {
+      const count = analysis.rejectionReasons[reason];
+      const amount = analysis.rejectionAmounts[reason];
+      
+      if (count > 0) {
+        html += `
+          <div class="rejection-card">
+            <h6>${getReasonLabel(reason)}</h6>
+            <div class="rejection-stats">
+              <div class="rejection-metric-item">
+                <div class="rejection-metric-value">${count}</div>
+                <div class="rejection-metric-label">Cases</div>
+              </div>
+              <div class="rejection-metric-item">
+                <div class="rejection-metric-value">AED ${amount.toFixed(2)}</div>
+                <div class="rejection-metric-label">Amount Saved</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    });
+    
+    // Add summary card
+    html += `
+      <div class="rejection-card">
+        <h6>Summary</h6>
+        <div class="rejection-stats">
+          <div class="rejection-metric-item">
+            <div class="rejection-metric-value">${rejectedCases.length}</div>
+            <div class="rejection-metric-label">Total Rejected</div>
+          </div>
+          <div class="rejection-metric-item">
+            <div class="rejection-metric-value">AED ${rejectedCases.reduce((sum, t) => sum + (t.compensation || 0), 0).toFixed(2)}</div>
+            <div class="rejection-metric-label">Total Saved</div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    html += '</div>';
+    
+    document.getElementById('rejectionAnalysisContainer').innerHTML = html;
+  }
+  
+  function getReasonLabel(reason) {
+    const labels = {
+      no_evidence: 'لا يوجد دليل',
+      incorrect_claim: 'ادعاء غير صحيح',
+      driver_fault: 'خطأ السائق',
+      customer_error: 'خطأ العميل',
+      other: 'أسباب أخرى'
+    };
+    return labels[reason] || reason;
+  }
+  
   // ===== Summary Section =====
   function renderSummary() {
     // Financial Overview
@@ -1877,15 +2081,15 @@
     statusChart = new Chart(ctx2, {
       type: 'bar',
       data: {
-        labels: ['Open', 'Sent', 'Closed', 'Refunded'],
+        labels: ['Open', 'Sent', 'Closed', 'Rejected'],
         datasets: [{
           data: [
             tickets.filter(t => t.status === 'Open').length,
             tickets.filter(t => t.status === 'Sent').length,
             tickets.filter(t => t.status === 'Closed').length,
-            tickets.filter(t => t.isRefunded).length
+            tickets.filter(t => t.status === 'Rejected').length
           ],
-          backgroundColor: ['#0d6efd', '#ffc107', '#198754', '#28a745']
+          backgroundColor: ['#0d6efd', '#ffc107', '#198754', '#dc3545']
         }]
       },
       options: {
@@ -1987,7 +2191,6 @@
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        indexAxis: 'y',
         plugins: {
           legend: { display: false }
         },
@@ -2625,6 +2828,128 @@ ${t.branch}`;
     addCommand('Send WhatsApp', `WhatsApp message sent for Order ${t.orderId}`);
   }
   
+  // ===== Rejection functionality =====
+  function openRejectionModal() {
+    // ملء قائمة الحالات المفتوحة فقط
+    const openCases = tickets.filter(t => t.status === 'Open' || t.status === 'Sent');
+    const caseSelect = document.getElementById('rejectionCase');
+    caseSelect.innerHTML = '<option value="">اختر حالة</option>';
+    
+    openCases.forEach(ticket => {
+      const option = document.createElement('option');
+      option.value = ticket.id;
+      option.textContent = `${ticket.orderId} - ${ticket.branch} (${ticket.platform})`;
+      caseSelect.appendChild(option);
+    });
+    
+    new bootstrap.Modal(document.getElementById('rejectionModal')).show();
+    addCommand('Open Rejection Modal');
+  }
+  
+  function openRejectionModalForCase(caseId) {
+    // Fill the case directly
+    const ticket = tickets.find(t => t.id === caseId);
+    if (!ticket) return;
+    
+    document.getElementById('rejectionCase').value = ticket.id;
+    document.getElementById('rejectionReason').value = '';
+    document.getElementById('rejectionNotes').value = '';
+    document.getElementById('sendEmail').checked = true;
+    document.getElementById('sendWhatsApp').checked = false;
+    
+    new bootstrap.Modal(document.getElementById('rejectionModal')).show();
+    addCommand('Open Rejection Modal for Case', `Order ${ticket.orderId}`);
+  }
+  
+  document.getElementById('rejectionForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const caseId = document.getElementById('rejectionCase').value;
+    const reason = document.getElementById('rejectionReason').value;
+    const notes = document.getElementById('rejectionNotes').value;
+    const sendEmail = document.getElementById('sendEmail').checked;
+    const sendWhatsApp = document.getElementById('sendWhatsApp').checked;
+    
+    const ticket = tickets.find(t => t.id === caseId);
+    if (!ticket) return;
+    
+    // تحديث حالة الحالة إلى "مرفوض"
+    ticket.status = 'Rejected';
+    ticket.rejectionReason = reason;
+    ticket.rejectionNotes = notes;
+    ticket.rejectionDate = new Date().toISOString();
+    
+    // إنشاء رسالة الرفض
+    const rejectionMessage = generateRejectionMessage(ticket, reason, notes);
+    
+    // إرسال البريد الإلكتروني إذا تم تحديده
+    if (sendEmail) {
+      sendRejectionEmail(ticket, rejectionMessage);
+    }
+    
+    // إرسال واتساب إذا تم تحديده
+    if (sendWhatsApp) {
+      sendRejectionWhatsApp(ticket, rejectionMessage);
+    }
+    
+    // حفظ البيانات
+    save();
+    renderAll();
+    
+    // إغلاق النافذة
+    bootstrap.Modal.getInstance(document.getElementById('rejectionModal')).hide();
+    
+    // إظهار إشعار بالنجاح
+    showNotif('تم رفض التعويض بنجاح', 'success');
+    
+    // تسجيل الأمر
+    addCommand('Reject Compensation', `تم رفض تعويض الحالة ${ticket.orderId}`);
+  });
+  
+  function generateRejectionMessage(ticket, reason, notes) {
+    const templates = {
+      no_evidence: `بخصوص الحالة رقم ${ticket.orderId}، نحن نرفض طلب التعويض لعدم وجود دليل يثبت الادعاء. وفقًا لسياسة المنصة وقانون حماية المستهلك في الإمارات، يجب تقديم دليل مادي لدعم المطالبة التعويضية.`,
+      incorrect_claim: `بخصوص الحالة رقم ${ticket.orderId}، نحن نرفض طلب التعويض لأن الادعاء غير صحيح. السجلات تظهر أن الطلب تمت معالجته بشكل صحيح وتم تسليمه كما هو مطلوب.`,
+      driver_fault: `بخصوص الحالة رقم ${ticket.orderId}، نحن نرفض طلب التعويض لأن المشكلة ناتجة عن خطأ السائق أثناء التوصيل. المطعم لا يتحمل مسؤولية الأضرار الناتجة عن التعامل غير السليم من قبل السائق.`,
+      customer_error: `بخصوص الحالة رقم ${ticket.orderId}، نحن نرفض طلب التعويض لأن المشكلة ناتجة عن خطأ من العميل. الطلب تمت معالجته وفقًا للمعلومات المقدمة من العميل.`,
+      other: `بخصوص الحالة رقم ${ticket.orderId}، نحن نرفض طلب التعويض للأسباب التالية: ${notes}`
+    };
+    
+    const baseMessage = `مرحباً،
+
+نحن نكتب فيما يخص طلب التعويض الخاص بالطلب رقم ${ticket.orderId} بتاريخ ${formatDateISO(ticket.orderDate)} من مطعم ${ticket.branch} عبر منصة ${ticket.platform}.
+
+بعد مراجعة السجلات والتحقق من الحالة، نرى أن هذا الطلب لا يستحق التعويض، وذلك للأسباب التالية:
+
+${templates[reason] || notes}
+
+نحن نرفض هذا الطلب ونطلب إلغاء التعويض المطبق.
+
+مع خالص التقدير،
+${ticket.branch}`;
+
+    return baseMessage;
+  }
+  
+  function sendRejectionEmail(ticket, message) {
+    const subject = `رفض طلب التعويض - Order ${ticket.orderId}`;
+    const emailBody = message;
+    
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+  }
+  
+  function sendRejectionWhatsApp(ticket, message) {
+    const branchNumber = branchWhats[ticket.branch] || '';
+    
+    if (branchNumber) {
+      const whatsappUrl = `https://wa.me/${branchNumber}?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank');
+    } else {
+      // استخدام الرقم الافتراضي إذا لم يكن هناك رقم خاص للفرع
+      window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+    }
+  }
+  
   // ===== Other actions =====
   function copyTicket(id) {
     const t = tickets.find(x => x.id === id); 
@@ -2691,6 +3016,7 @@ ${t.branch}`;
   searchInput.addEventListener('input', debounce(() => renderTickets(), 200));
   filterBranch.addEventListener('change', () => renderTickets());
   filterPlatform.addEventListener('change', () => renderTickets());
+  filterStatus.addEventListener('change', () => renderTickets());
   function debounce(fn, ms = 200) { 
     let t; 
     return (...a) => { 
@@ -2772,6 +3098,8 @@ ${t.branch}`;
       RefundDate: t.refundDate,
       Evidence: t.evidence,
       Status: t.status,
+      RejectionReason: t.rejectionReason,
+      RejectionNotes: t.rejectionNotes,
       DateCreated: t.dateCreated || ''
     }));
     const ws = XLSX.utils.json_to_sheet(data);
@@ -2821,6 +3149,7 @@ ${t.branch}`;
       const caseAnalysisEl = document.querySelector('.case-analysis-section');
       const refundAnalysisEl = document.querySelector('.refund-analysis-section');
       const compensationAnalysisEl = document.querySelector('.compensation-analysis-section');
+      const rejectionAnalysisEl = document.querySelector('.rejection-analysis-section');
       
       // Render each section to canvas
       const canvas1 = await html2canvas(summaryEl, { scale: 1.5, useCORS: true });
@@ -2829,6 +3158,7 @@ ${t.branch}`;
       const canvas4 = await html2canvas(caseAnalysisEl, { scale: 1.5, useCORS: true });
       const canvas5 = await html2canvas(refundAnalysisEl, { scale: 1.5, useCORS: true });
       const canvas6 = await html2canvas(compensationAnalysisEl, { scale: 1.5, useCORS: true });
+      const canvas7 = await html2canvas(rejectionAnalysisEl, { scale: 1.5, useCORS: true });
       
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -2881,6 +3211,14 @@ ${t.branch}`;
       const img6W = pageW - 20;
       const img6H = img6Props.height * img6W / img6Props.width;
       pdf.addImage(img6, 'PNG', 10, 10, img6W, img6H);
+      
+      // Seventh page: rejection analysis
+      pdf.addPage();
+      const img7 = canvas7.toDataURL('image/png');
+      const img7Props = pdf.getImageProperties(img7);
+      const img7W = pageW - 20;
+      const img7H = img7Props.height * img7W / img7Props.width;
+      pdf.addImage(img7, 'PNG', 10, 10, img7W, img7H);
       
       pdf.save(`dashboard_summary_${new Date().toISOString().slice(0, 10)}.pdf`);
       
